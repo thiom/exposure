@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}Latest photos{% endblock %}
+
+{% block content %}
+<div class="page-top">
+  <h1>latest photos</h1>
+</div>
+
+{% include "photo_list.html" %}
+
+<nav class="pagination">
+  {% if page > 1 %}
+  <a href="/latest/{{ page - 1 }}">&larr; newer</a>
+  {% else %}
+  <span class="disabled">&larr; newer</span>
+  {% endif %}
+  <span>{{ page }} / {{ page_count }}</span>
+  {% if page < page_count %}
+  <a href="/latest/{{ page + 1 }}">older &rarr;</a>
+  {% else %}
+  <span class="disabled">older &rarr;</span>
+  {% endif %}
+</nav>
+{% endblock %}

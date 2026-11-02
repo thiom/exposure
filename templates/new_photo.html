@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}Add new photo{% endblock %}
+
+{% block content %}
+<div class="narrow">
+  <h1>add new photo</h1>
+  <form action="/create_photo" method="post" enctype="multipart/form-data" class="form">
+    <p>
+      <label for="image">image (.jpg or .jpeg, max 50 MB)</label>
+      <input type="file" name="image" id="image" accept=".jpg,.jpeg" required />
+    </p>
+    <p>
+      <label for="description">description</label>
+      <textarea name="description" id="description" rows="4" maxlength="200" required></textarea>
+    </p>
+    <p>
+      <label for="tags">tags (optional, separated by commas)</label>
+      <input type="text" name="tags" id="tags" />
+      <span class="muted">You can search existing tags on the next page.</span>
+    </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <input type="submit" value="upload" />
+  </form>
+</div>
+{% endblock %}

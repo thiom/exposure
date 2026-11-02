@@ -1,0 +1,7 @@
+<div class="photo-list">
+  {% for photo in photos %}
+  <a href="/photo/{{ photo.id }}?back={{ request.full_path | urlencode }}">
+    <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" loading="lazy" />
+  </a>
+  {% endfor %}
+</div>

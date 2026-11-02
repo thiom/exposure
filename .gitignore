@@ -1,0 +1,6 @@
+docs/
+__pycache__
+venv
+database.db
+test_photos/
+.DS_Store

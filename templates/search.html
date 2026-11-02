@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ query }}{% endblock %}
+
+{% block content %}
+<div class="page-top">
+  {% include "search_form.html" %}
+</div>
+
+{% include "photo_list.html" %}
+{% endblock %}

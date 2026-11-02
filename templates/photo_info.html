@@ -1,0 +1,14 @@
+<p class="description">{{ photo.description }}</p>
+<dl class="details">
+  <dt>by</dt>
+  <dd>{{ photo.username }}</dd>
+  <dt>added</dt>
+  <dd>{{ photo.date_time_added }}</dd>
+</dl>
+{% if tags %}
+<ul class="tags">
+  {% for tag in tags %}
+  <li><a href="/tag/{{ tag.id }}">#{{ tag.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}

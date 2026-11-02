@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}Photo{% endblock %}
+
+{% block content %}
+<div class="photo-view">
+  <div class="photo-image">
+    <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" />
+  </div>
+  <aside class="photo-info">
+    <a href="{{ back }}" class="button">back</a>
+    {% include "photo_info.html" %}
+    {% if session.user_id == photo.user_id %}
+    <a href="/edit_photo/{{ photo.id }}" class="button">edit</a>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

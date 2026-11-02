@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}Delete photo{% endblock %}
+
+{% block content %}
+<div class="narrow">
+  <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" class="thumbnail" />
+  <h1>delete photo</h1>
+  <p>Are you sure you want to delete this photo?</p>
+  <form action="/remove_photo/{{ photo.id }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <input type="submit" name="remove" value="delete photo" class="danger" />
+    <input type="submit" name="back" value="cancel" />
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ tag.title }}{% endblock %}
+
+{% block content %}
+<div class="page-top">
+  <h1>#{{ tag.title }}</h1>
+</div>
+
+{% include "photo_list.html" %}
+{% endblock %}

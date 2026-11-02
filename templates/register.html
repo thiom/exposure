@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block nav_left %}{% endblock %}
+{% block nav_right %}{% endblock %}
+
+{% block content %}
+<div class="narrow">
+  <h1>register</h1>
+  <form action="/create" method="post" class="form">
+    <p>
+      <label for="username">username (1-30 characters)</label>
+      <input type="text" name="username" id="username" maxlength="30" required />
+    </p>
+    <p>
+      <label for="password1">password (10-30 characters)</label>
+      <input type="password" name="password1" id="password1" minlength="10" maxlength="30" required />
+    </p>
+    <p>
+      <label for="password2">password again</label>
+      <input type="password" name="password2" id="password2" minlength="10" maxlength="30" required />
+    </p>
+    <input type="submit" value="create account" />
+  </form>
+</div>
+{% endblock %}

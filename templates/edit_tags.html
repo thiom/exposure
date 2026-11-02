@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block title %}Tags{% endblock %}
+
+{% block content %}
+<div class="narrow">
+  <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" class="thumbnail" />
+
+  <h1>tags</h1>
+  <p class="muted">{{ tags | count }} / {{ max_tags }}</p>
+
+  {% if tags %}
+  <ul class="tag-rows">
+    {% for tag in tags %}
+    <li>
+      <a href="/tag/{{ tag.id }}">#{{ tag.title }}</a>
+      <form action="/remove_tag" method="post" class="inline">
+        <input type="hidden" name="photo_id" value="{{ photo.id }}" />
+        <input type="hidden" name="tag_id" value="{{ tag.id }}" />
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+        <input type="submit" value="remove" class="link-button" />
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if tags | count < max_tags %}
+  <form action="/tags/{{ photo.id }}" method="get" class="search-form">
+    <label for="query" class="hidden-label">Find tag</label>
+    <input type="text" name="query" id="query" value="{{ query }}" maxlength="20" placeholder="find or create a tag" />
+    <input type="submit" value="find" />
+  </form>
+
+  {% if query %}
+  <div class="suggestions">
+    {% for tag in suggestions %}
+    <form action="/add_tag" method="post" class="inline">
+      <input type="hidden" name="photo_id" value="{{ photo.id }}" />
+      <input type="hidden" name="title" value="{{ tag.title }}" />
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+      <input type="submit" value="#{{ tag.title }}" class="tag-button" />
+    </form>
+    {% endfor %}
+    {% if new_title %}
+    <form action="/add_tag" method="post" class="inline">
+      <input type="hidden" name="photo_id" value="{{ photo.id }}" />
+      <input type="hidden" name="title" value="{{ new_title }}" />
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+      <input type="submit" value="+ create #{{ new_title }}" class="tag-button new" />
+    </form>
+    {% endif %}
+    {% if not suggestions and not new_title %}
+    <p class="muted">No matching tags.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% endif %}
+
+  <p>
+    <a href="/photo/{{ photo.id }}" class="button">done</a>
+  </p>
+</div>
+{% endblock %}

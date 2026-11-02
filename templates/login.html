@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block nav_left %}{% endblock %}
+{% block nav_right %}{% endblock %}
+
+{% block content %}
+<div class="narrow">
+  <h1>log in</h1>
+  <form action="/login" method="post" class="form">
+    <p>
+      <label for="username">username</label>
+      <input type="text" name="username" id="username" required />
+    </p>
+    <p>
+      <label for="password">password</label>
+      <input type="password" name="password" id="password" required />
+    </p>
+    <input type="submit" value="log in" />
+  </form>
+  <p>
+    <a href="/register" class="button">register</a>
+  </p>
+</div>
+{% endblock %}

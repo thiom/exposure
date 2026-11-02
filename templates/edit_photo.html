@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit photo{% endblock %}
+
+{% block content %}
+<div class="photo-view">
+  <div class="photo-image">
+    <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" />
+  </div>
+  <aside class="photo-info">
+    <a href="/photo/{{ photo.id }}" class="button">back</a>
+    {% include "photo_info.html" %}
+
+    <form action="/update_photo" method="post" class="form">
+      <p>
+        <label for="description">description</label>
+        <textarea name="description" id="description" rows="4" maxlength="200" required>{{ photo.description }}</textarea>
+      </p>
+      <input type="hidden" name="photo_id" value="{{ photo.id }}" />
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+      <input type="submit" value="save" />
+    </form>
+
+    <p>
+      <a href="/tags/{{ photo.id }}" class="button">edit tags</a>
+    </p>
+    <p>
+      <a href="/remove_photo/{{ photo.id }}" class="button danger">delete photo</a>
+    </p>
+  </aside>
+</div>
+{% endblock %}

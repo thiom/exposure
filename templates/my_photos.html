@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}My photos{% endblock %}
+
+{% block content %}
+<div class="page-top">
+  <a href="/new_photo" class="button">add new</a>
+</div>
+
+{% if photos %}
+{% include "photo_list.html" %}
+{% else %}
+<p class="empty">You have not added any photos yet.</p>
+{% endif %}
+{% endblock %}
