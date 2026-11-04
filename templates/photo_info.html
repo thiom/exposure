@@ -1,5 +1,25 @@
 <p class="description">{{ photo.description }}</p>
 <dl class="details">
+  {% if photo.camera %}
+  <dt>camera</dt>
+  <dd>{{ photo.camera }}</dd>
+  {% endif %}
+  {% if photo.lens %}
+  <dt>lens</dt>
+  <dd>{{ photo.lens }}</dd>
+  {% endif %}
+  {% if photo.focal_length %}
+  <dt>focal length</dt>
+  <dd>{{ photo.focal_length | show_number }} mm</dd>
+  {% endif %}
+  {% if photo.aperture %}
+  <dt>aperture</dt>
+  <dd>f/{{ photo.aperture | show_number }}</dd>
+  {% endif %}
+  {% if photo.shutter_speed %}
+  <dt>shutter speed</dt>
+  <dd>{{ photo.shutter_speed | show_shutter_speed }}</dd>
+  {% endif %}
   <dt>by</dt>
   <dd>{{ photo.username }}</dd>
   <dt>added</dt>

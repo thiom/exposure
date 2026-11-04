@@ -1,0 +1,27 @@
+<p>
+  <label for="camera">camera (optional)</label>
+  <input type="text" name="camera" id="camera" value="{{ photo.camera or '' }}" maxlength="50" />
+</p>
+<p>
+  <label for="lens">lens (optional)</label>
+  <input type="text" name="lens" id="lens" value="{{ photo.lens or '' }}" maxlength="50" />
+</p>
+<p>
+  <label for="focal_length">focal length in mm (optional, 1.0-1000.0)</label>
+  <input type="text" name="focal_length" id="focal_length" inputmode="decimal"
+         value="{{ photo.focal_length | show_number if photo.focal_length else '' }}"
+         pattern="[0-9]{1,4}([.,][0-9])?" />
+</p>
+<p>
+  <label for="aperture">aperture f/ (optional, 1.00-50.00)</label>
+  <input type="text" name="aperture" id="aperture" inputmode="decimal"
+         value="{{ photo.aperture | show_number if photo.aperture else '' }}"
+         pattern="[0-9]{1,4}([.,][0-9]{1,2})?" />
+</p>
+<p>
+  <label for="shutter_speed">shutter speed 1/x s (optional, 0.01-5000.00)</label>
+  <input type="text" name="shutter_speed" id="shutter_speed" inputmode="decimal"
+         value="{{ photo.shutter_speed | show_number if photo.shutter_speed else '' }}"
+         pattern="[0-9]{1,4}([.,][0-9]{1,2})?" />
+  <span class="muted">For example 250 means 1/250 s and 0.5 means 2 s.</span>
+</p>

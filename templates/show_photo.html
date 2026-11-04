@@ -6,6 +6,7 @@
 <div class="photo-view">
   <div class="photo-image">
     <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" />
+    {% include "comments.html" %}
   </div>
   <aside class="photo-info">
     <a href="{{ back }}" class="button">back</a>

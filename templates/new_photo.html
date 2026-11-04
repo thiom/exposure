@@ -19,6 +19,7 @@
       <input type="text" name="tags" id="tags" />
       <span class="muted">You can search existing tags on the next page.</span>
     </p>
+    {% include "photo_details_form.html" %}
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="upload" />
   </form>

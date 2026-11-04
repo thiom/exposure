@@ -1,6 +1,7 @@
 import math
 import secrets
 import sqlite3
+import urllib.parse
 
 from flask import Flask
 from flask import abort, flash, make_response, redirect, render_template, request, session
@@ -33,8 +34,7 @@ def start_session(user_id, username):
     session["username"] = username
     session["csrf_token"] = secrets.token_hex(16)
 
-def get_back_url():
-    back = request.args.get("back", "")
+def get_back_url(back):
     if back.endswith("?"):
         back = back[:-1]
     if not back.startswith("/") or back.startswith("//") or "\\" in back:
@@ -48,6 +48,16 @@ def get_own_photo(photo_id):
     if photo["user_id"] != session["user_id"]:
         abort(403)
     return photo
+
+@app.template_filter()
+def show_number(number):
+    return f"{number:g}"
+
+@app.template_filter()
+def show_shutter_speed(shutter_speed):
+    if shutter_speed > 1:
+        return "1/" + show_number(shutter_speed) + " s"
+    return show_number(round(1 / shutter_speed, 1)) + " s"
 
 @app.route("/")
 def index():
@@ -101,8 +111,10 @@ def show_photo(photo_id):
     if not photo:
         abort(404)
     photo_tags = tags.get_tags(photo_id)
+    comments = photos.get_comments(photo_id)
     return render_template("show_photo.html", photo=photo, tags=photo_tags,
-                           back=get_back_url())
+                           comments=comments, back=get_back_url(request.args.get("back", "")),
+                           max_comments=photos.MAX_COMMENTS_PER_PHOTO)
 
 @app.route("/image/<int:photo_id>")
 def show_image(photo_id):
@@ -120,7 +132,7 @@ def new_photo():
     if photos.user_photo_count(session["user_id"]) >= MAX_PHOTOS_PER_USER:
         flash("You have reached the maximum of " + str(MAX_PHOTOS_PER_USER) + " photos")
         return redirect("/my_photos")
-    return render_template("new_photo.html")
+    return render_template("new_photo.html", photo={})
 
 @app.route("/create_photo", methods=["POST"])
 def create_photo():
@@ -134,6 +146,12 @@ def create_photo():
     description = request.form["description"]
     if not description.strip() or len(description) > 200:
         abort(403)
+
+    try:
+        details = photos.parse_details(request.form)
+    except ValueError as error:
+        flash(str(error))
+        return redirect("/new_photo")
 
     tag_titles = tags.parse_titles(request.form.get("tags", ""))
     if tag_titles is None:
@@ -157,7 +175,7 @@ def create_photo():
         flash("The image is not a valid JPEG file")
         return redirect("/new_photo")
 
-    photo_id = photos.add_photo(user_id, image, description, tag_titles)
+    photo_id = photos.add_photo(user_id, image, description, details, tag_titles)
     return redirect("/tags/" + str(photo_id))
 
 @app.route("/edit_photo/<int:photo_id>")
@@ -165,7 +183,10 @@ def edit_photo(photo_id):
     require_login()
     photo = get_own_photo(photo_id)
     photo_tags = tags.get_tags(photo_id)
-    return render_template("edit_photo.html", photo=photo, tags=photo_tags)
+    comments = photos.get_comments(photo_id)
+    return render_template("edit_photo.html", photo=photo, tags=photo_tags,
+                           comments=comments, redirect="/edit_photo/" + str(photo_id),
+                           max_comments=photos.MAX_COMMENTS_PER_PHOTO)
 
 @app.route("/update_photo", methods=["POST"])
 def update_photo():
@@ -179,8 +200,41 @@ def update_photo():
     if not description.strip() or len(description) > 200:
         abort(403)
 
-    photos.update_photo(photo_id, description)
+    try:
+        details = photos.parse_details(request.form)
+    except ValueError as error:
+        flash(str(error))
+        return redirect("/edit_photo/" + str(photo_id))
+
+    photos.update_photo(photo_id, description, details)
     return redirect("/photo/" + str(photo_id))
+
+@app.route("/create_comment", methods=["POST"])
+def create_comment():
+    require_login()
+    check_csrf()
+
+    photo_id = request.form["photo_id"]
+    photo = photos.get_photo(photo_id)
+    if not photo:
+        abort(404)
+
+    content = request.form["content"]
+    if not content.strip() or len(content) > 200:
+        abort(403)
+
+    url = request.form.get("redirect", "")
+    if url != "/edit_photo/" + str(photo_id):
+        back = get_back_url(request.form.get("back", ""))
+        url = "/photo/" + str(photo_id) + "?back=" + urllib.parse.quote(back)
+
+    if photos.comment_count(photo_id) >= photos.MAX_COMMENTS_PER_PHOTO:
+        flash("This photo already has the maximum of "
+              + str(photos.MAX_COMMENTS_PER_PHOTO) + " comments")
+        return redirect(url)
+
+    photos.add_comment(photo_id, session["user_id"], content.strip())
+    return redirect(url + "#comments")
 
 @app.route("/tags/<int:photo_id>")
 def edit_tags(photo_id):

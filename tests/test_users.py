@@ -89,10 +89,10 @@ class TestLogin(BaseTestCase):
 
     def test_navigation_depends_on_login(self):
         response = self.client.get("/")
-        self.assertIn(b"Log in", response.data)
+        self.assertIn(b"log in", response.data)
         self.assertNotIn(b"my photos", response.data)
 
         self.login("maija")
         response = self.client.get("/")
-        self.assertIn(b"Log out", response.data)
+        self.assertIn(b"log out", response.data)
         self.assertIn(b"my photos", response.data)

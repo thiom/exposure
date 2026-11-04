@@ -6,6 +6,7 @@
 <div class="photo-view">
   <div class="photo-image">
     <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" />
+    {% include "comments.html" %}
   </div>
   <aside class="photo-info">
     <a href="/photo/{{ photo.id }}" class="button">back</a>
@@ -16,6 +17,7 @@
         <label for="description">description</label>
         <textarea name="description" id="description" rows="4" maxlength="200" required>{{ photo.description }}</textarea>
       </p>
+      {% include "photo_details_form.html" %}
       <input type="hidden" name="photo_id" value="{{ photo.id }}" />
       <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
       <input type="submit" value="save" />

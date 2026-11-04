@@ -64,18 +64,21 @@ class BaseTestCase(unittest.TestCase):
             return session.get("csrf_token", "")
 
     def upload_photo(self, description="A photo", tags="", image=FAKE_JPEG,
-                     filename="photo.jpg", csrf_token=None):
+                     filename="photo.jpg", csrf_token=None, details={}):
         if csrf_token is None:
             csrf_token = self.csrf_token()
-        return self.client.post("/create_photo", data={
+        data = {
             "description": description,
             "tags": tags,
             "image": (io.BytesIO(image), filename),
             "csrf_token": csrf_token,
-        }, content_type="multipart/form-data")
+        }
+        data.update(details)
+        return self.client.post("/create_photo", data=data,
+                                content_type="multipart/form-data")
 
-    def add_photo(self, description="A photo", tags=""):
-        response = self.upload_photo(description=description, tags=tags)
+    def add_photo(self, description="A photo", tags="", details={}):
+        response = self.upload_photo(description=description, tags=tags, details=details)
         self.assertEqual(response.status_code, 302)
         return int(response.headers["Location"].split("/")[-1])
 

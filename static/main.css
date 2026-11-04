@@ -276,6 +276,41 @@ form.inline {
   border-top: 1px solid var(--line);
 }
 
+/* comments */
+
+.comments {
+  max-width: 40rem;
+  margin-top: 3rem;
+}
+
+.comments h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 1.25rem 0;
+}
+
+.comment {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.comment p {
+  margin: 0;
+}
+
+.comment-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.comment-content {
+  white-space: pre-line;
+}
+
+.comment-form {
+  margin-top: 1.5rem;
+}
+
 /* narrow pages: login, register, add photo, tags */
 
 .narrow {

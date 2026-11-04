@@ -1,0 +1,34 @@
+<section class="comments" id="comments">
+  <h2>comments</h2>
+  {% for comment in comments %}
+  <div class="comment">
+    <p class="comment-meta">{{ comment.username }} · {{ comment.sent_at }}</p>
+    <p class="comment-content">{{ comment.content }}</p>
+  </div>
+  {% else %}
+  <p class="muted">No comments yet.</p>
+  {% endfor %}
+
+  {% if session.user_id %}
+  {% if comments | count < max_comments %}
+  <form action="/create_comment" method="post" class="form comment-form">
+    <p>
+      <label for="content">new comment</label>
+      <textarea name="content" id="content" rows="3" maxlength="200" required></textarea>
+    </p>
+    <input type="hidden" name="photo_id" value="{{ photo.id }}" />
+    {% if redirect %}
+    <input type="hidden" name="redirect" value="{{ redirect }}" />
+    {% else %}
+    <input type="hidden" name="back" value="{{ back }}" />
+    {% endif %}
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <input type="submit" value="comment" />
+  </form>
+  {% else %}
+  <p class="muted">This photo has reached the maximum of {{ max_comments }} comments.</p>
+  {% endif %}
+  {% else %}
+  <p><a href="/login" class="button">log in to comment</a></p>
+  {% endif %}
+</section>
