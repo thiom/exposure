@@ -106,6 +106,7 @@ textarea:focus {
 }
 
 input[type="submit"],
+button,
 .button {
   display: inline-block;
   font: inherit;
@@ -118,6 +119,7 @@ input[type="submit"],
 }
 
 input[type="submit"]:hover,
+button:hover:enabled,
 .button:hover {
   background: var(--text);
   color: var(--background);
@@ -173,6 +175,24 @@ form.inline {
   max-width: 26rem;
 }
 
+/* search fields on the latest pages: narrower, button without a box */
+
+.search-form.compact {
+  max-width: 22.1rem;
+}
+
+.search-form.compact input[type="submit"] {
+  border: none;
+  padding: 0.4rem 0;
+}
+
+.search-form.compact input[type="submit"]:hover {
+  background: none;
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .home main {
   display: flex;
   align-items: center;
@@ -221,6 +241,288 @@ form.inline {
 
 .pagination .disabled {
   color: var(--line);
+}
+
+/* latest tabs */
+
+.tabs {
+  display: flex;
+  gap: 1.1em;
+  margin: 0 0 1.5rem 0;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.tabs a {
+  color: var(--muted);
+}
+
+.tabs a.selected {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* collection lists */
+
+.collection-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4.5rem 3rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 3rem var(--edge) 5rem var(--edge);
+}
+
+.collection-list.single {
+  grid-template-columns: minmax(0, 34rem);
+  justify-content: center;
+}
+
+/* my collections and my photos: the plus sign is at the left edge of the
+   page, in line with the "latest" link, and its height is a third of the
+   collection image height (images are 3:2, so 2/9 of the card width). The
+   lists stay centered but are kept narrow enough to leave room for the plus
+   sign. My photos uses the same plus sign size as my collections. */
+
+.my-collections,
+.my-photos {
+  position: relative;
+  container-type: inline-size;
+  --list-width: min(72rem - 2 * var(--edge),
+                    (50cqw - var(--edge) - 1.6667rem) * 18 / 11);
+  --card-width: calc((var(--list-width) - 3rem) / 2);
+}
+
+.my-collections.single {
+  --list-width: min(34rem, (50cqw - var(--edge) - 2rem) * 18 / 13);
+  --card-width: var(--list-width);
+}
+
+.my-collections .collection-list {
+  width: var(--list-width);
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.my-collections .collection-list.single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.my-photos .photo-list {
+  width: min(60rem - 2 * var(--edge),
+             100cqw - 2 * (var(--edge) + var(--card-width) * 2 / 9 + 2rem));
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.add-new {
+  position: absolute;
+  top: 3rem;
+  left: var(--edge);
+  display: block;
+  width: calc(var(--card-width) * 2 / 9);
+  aspect-ratio: 1;
+}
+
+.add-new::before,
+.add-new::after,
+.add-plus::before,
+.add-plus::after {
+  content: "";
+  position: absolute;
+  background: var(--text);
+}
+
+.add-new::before,
+.add-plus::before {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+}
+
+.add-new::after,
+.add-plus::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
+
+.add-new:hover::before,
+.add-new:hover::after,
+.add-plus:hover::before,
+.add-plus:hover::after {
+  background: var(--muted);
+}
+
+.collection-card {
+  display: block;
+}
+
+.collection-card:hover {
+  text-decoration: none;
+}
+
+.collection-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.collection-card span {
+  display: block;
+}
+
+.collection-title {
+  font-weight: 500;
+}
+
+.collection-card:hover .collection-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.collection-description {
+  white-space: pre-line;
+}
+
+.collection-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* single collection */
+
+/* same width as .photo-list so the text lines up with the left edge of the photos */
+.collection-header {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem var(--edge) 0 var(--edge);
+}
+
+.collection-header h1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+}
+
+/* the description reaches at most halfway across the photos */
+.collection-header .collection-description {
+  max-width: 50%;
+  margin: 0 0 1.5rem 0;
+}
+
+.collection-header + .photo-list {
+  padding-bottom: 2rem;
+}
+
+.collection-footer {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 var(--edge) 4rem var(--edge);
+  text-align: right;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* collection form */
+
+.collection-form {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem var(--edge) 5rem var(--edge);
+}
+
+.collection-form-top {
+  max-width: 26rem;
+}
+
+/* save (and delete) on the left, cancel at the right edge of the fields */
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.draft-section {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.draft-section h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 1.25rem 0;
+}
+
+.selected-photos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.selected-photos li {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.selected-photos img {
+  display: block;
+  height: 4.5rem;
+  width: 6.75rem;
+  object-fit: cover;
+}
+
+.selected-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selected-buttons button {
+  padding: 0.2rem 0.6rem;
+}
+
+.pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.pick-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5.6rem;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* plus sign button that adds a photo to the collection */
+button.add-plus,
+button.add-plus:hover {
+  position: relative;
+  display: block;
+  width: 5.6rem;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.pick-row img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* single photo */
@@ -340,14 +642,22 @@ form.inline {
   border-bottom: 1px solid var(--line);
 }
 
-input[type="submit"].link-button {
+button:disabled {
+  color: var(--line);
+  border-color: var(--line);
+  cursor: default;
+}
+
+input[type="submit"].link-button,
+button.link-button {
   border: none;
   padding: 0;
   color: var(--muted);
   font-size: 0.85rem;
 }
 
-input[type="submit"].link-button:hover {
+input[type="submit"].link-button:hover,
+button.link-button:hover {
   background: none;
   color: var(--danger);
 }
@@ -381,4 +691,25 @@ input[type="submit"].tag-button.new {
   .photo-list {
     gap: 3rem;
   }
+
+  .collection-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem;
+  }
+
+  .my-collections .collection-list,
+  .my-photos .photo-list {
+    width: auto;
+    padding-left: var(--edge);
+    padding-right: var(--edge);
+  }
+
+  .add-new {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 2rem var(--edge) 0 var(--edge);
+    width: calc((100cqw - 2 * var(--edge)) * 2 / 9);
+  }
+
 }

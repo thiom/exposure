@@ -7,6 +7,7 @@ from flask import Flask
 from flask import abort, flash, make_response, redirect, render_template, request, session
 
 import config
+import photo_collections
 import photos
 import tags
 import users
@@ -30,6 +31,7 @@ def check_csrf():
         abort(403)
 
 def start_session(user_id, username):
+    session.pop("collection_draft", None)
     session["user_id"] = user_id
     session["username"] = username
     session["csrf_token"] = secrets.token_hex(16)
@@ -48,6 +50,27 @@ def get_own_photo(photo_id):
     if photo["user_id"] != session["user_id"]:
         abort(403)
     return photo
+
+def get_own_collection(collection_id):
+    collection = photo_collections.get_collection(collection_id)
+    if not collection:
+        abort(404)
+    if collection["user_id"] != session["user_id"]:
+        abort(403)
+    return collection
+
+def get_page_count(count):
+    return max(math.ceil(count / PAGE_SIZE), 1)
+
+def parse_id(value):
+    try:
+        return int(value)
+    except ValueError:
+        abort(403)
+
+@app.template_filter()
+def show_date(date_time):
+    return date_time[:10]
 
 @app.template_filter()
 def show_number(number):
@@ -79,8 +102,7 @@ def search():
 @app.route("/latest")
 @app.route("/latest/<int:page>")
 def latest(page=1):
-    page_count = math.ceil(photos.photo_count() / PAGE_SIZE)
-    page_count = max(page_count, 1)
+    page_count = get_page_count(photos.photo_count())
 
     if page < 1:
         return redirect("/latest/1")
@@ -89,13 +111,202 @@ def latest(page=1):
 
     latest_photos = photos.get_photos(page, PAGE_SIZE)
     return render_template("latest.html", page=page, page_count=page_count,
-                           photos=latest_photos)
+                           page_url="/latest/", suffix="", photos=latest_photos)
+
+@app.route("/collections")
+@app.route("/collections/<int:page>")
+def latest_collections(page=1):
+    query = request.args.get("query", "").strip()
+    if query:
+        count = photo_collections.find_count(query)
+        suffix = "?query=" + urllib.parse.quote(query)
+    else:
+        count = photo_collections.collection_count()
+        suffix = ""
+    page_count = get_page_count(count)
+
+    if page < 1:
+        return redirect("/collections/1" + suffix)
+    if page > page_count:
+        return redirect("/collections/" + str(page_count) + suffix)
+
+    if query:
+        results = photo_collections.find_collections(query, page, PAGE_SIZE)
+    else:
+        results = photo_collections.get_collections(page, PAGE_SIZE)
+    return render_template("collections.html", query=query, page=page,
+                           page_count=page_count, page_url="/collections/",
+                           suffix=suffix, collections=results)
 
 @app.route("/my_photos")
 def my_photos():
     require_login()
     user_photos = photos.get_user_photos(session["user_id"])
     return render_template("my_photos.html", photos=user_photos)
+
+@app.route("/my_collections")
+def my_collections():
+    require_login()
+    user_collections = photo_collections.get_user_collections(session["user_id"])
+    return render_template("my_collections.html", collections=user_collections)
+
+@app.route("/collection/<int:collection_id>")
+def show_collection(collection_id):
+    collection = photo_collections.get_collection(collection_id)
+    if not collection:
+        abort(404)
+    collection_photos = photo_collections.get_photos(collection_id)
+    return render_template("show_collection.html", collection=collection,
+                           photos=collection_photos)
+
+@app.route("/new_collection")
+def new_collection():
+    require_login()
+    user_id = session["user_id"]
+    if photo_collections.user_collection_count(user_id) >= photo_collections.MAX_COLLECTIONS_PER_USER:
+        flash("You have reached the maximum of "
+              + str(photo_collections.MAX_COLLECTIONS_PER_USER) + " collections")
+        return redirect("/my_collections")
+
+    session["collection_draft"] = {
+        "collection_id": None,
+        "title": "",
+        "description": "",
+        "photo_ids": [],
+    }
+    return redirect("/collection_draft")
+
+@app.route("/edit_collection/<int:collection_id>")
+def edit_collection(collection_id):
+    require_login()
+    collection = get_own_collection(collection_id)
+    session["collection_draft"] = {
+        "collection_id": collection_id,
+        "title": collection["title"],
+        "description": collection["description"],
+        "photo_ids": photo_collections.get_photo_ids(collection_id),
+    }
+    return redirect("/collection_draft")
+
+@app.route("/collection_draft")
+def show_collection_draft():
+    require_login()
+    draft = session.get("collection_draft")
+    if not draft:
+        return redirect("/my_collections")
+
+    user_photos = photos.get_user_photos(session["user_id"])
+    photos_by_id = {photo["id"]: photo for photo in user_photos}
+    selected = [photos_by_id[photo_id] for photo_id in draft["photo_ids"]
+                if photo_id in photos_by_id]
+    available = [photo for photo in user_photos if photo["id"] not in draft["photo_ids"]]
+
+    if draft["collection_id"]:
+        cancel_url = "/collection/" + str(draft["collection_id"])
+    else:
+        cancel_url = "/my_collections"
+
+    return render_template("collection_form.html", draft=draft, selected=selected,
+                           available=available, cancel_url=cancel_url,
+                           has_photos=bool(user_photos),
+                           max_photos=photo_collections.MAX_PHOTOS_PER_COLLECTION)
+
+@app.route("/update_collection_draft", methods=["POST"])
+def update_collection_draft():
+    require_login()
+    check_csrf()
+
+    draft = session.get("collection_draft")
+    if not draft:
+        return redirect("/my_collections")
+
+    title = request.form["title"]
+    description = request.form["description"]
+    if len(title) > photo_collections.MAX_TITLE_LENGTH:
+        abort(403)
+    if len(description) > photo_collections.MAX_DESCRIPTION_LENGTH:
+        abort(403)
+    draft["title"] = title
+    draft["description"] = description
+
+    photo_ids = draft["photo_ids"]
+    if "add" in request.form:
+        photo_id = parse_id(request.form["add"])
+        get_own_photo(photo_id)
+        if photo_id not in photo_ids:
+            if len(photo_ids) >= photo_collections.MAX_PHOTOS_PER_COLLECTION:
+                flash("A collection can have at most "
+                      + str(photo_collections.MAX_PHOTOS_PER_COLLECTION) + " photos")
+            else:
+                photo_ids.append(photo_id)
+    elif "remove" in request.form:
+        photo_id = parse_id(request.form["remove"])
+        if photo_id in photo_ids:
+            photo_ids.remove(photo_id)
+    elif "up" in request.form or "down" in request.form:
+        move = "up" if "up" in request.form else "down"
+        photo_id = parse_id(request.form[move])
+        if photo_id in photo_ids:
+            index = photo_ids.index(photo_id)
+            other = index - 1 if move == "up" else index + 1
+            if 0 <= other < len(photo_ids):
+                photo_ids[index], photo_ids[other] = photo_ids[other], photo_ids[index]
+
+    session["collection_draft"] = draft
+
+    if "save" in request.form:
+        return save_collection_draft(draft)
+    return redirect("/collection_draft#selected")
+
+def save_collection_draft(draft):
+    user_id = session["user_id"]
+
+    title = draft["title"].strip()
+    description = draft["description"].strip()
+    if not title:
+        flash("The collection needs a title")
+        return redirect("/collection_draft")
+
+    own_ids = [photo["id"] for photo in photos.get_user_photos(user_id)]
+    photo_ids = [photo_id for photo_id in draft["photo_ids"] if photo_id in own_ids]
+    if not photo_ids:
+        flash("Add at least one photo to the collection")
+        return redirect("/collection_draft")
+
+    collection_id = draft["collection_id"]
+    if collection_id:
+        get_own_collection(collection_id)
+        photo_collections.update_collection(collection_id, title, description, photo_ids)
+    else:
+        if photo_collections.user_collection_count(user_id) >= photo_collections.MAX_COLLECTIONS_PER_USER:
+            flash("You have reached the maximum of "
+                  + str(photo_collections.MAX_COLLECTIONS_PER_USER) + " collections")
+            return redirect("/my_collections")
+        collection_id = photo_collections.add_collection(user_id, title, description, photo_ids)
+
+    del session["collection_draft"]
+    return redirect("/collection/" + str(collection_id))
+
+@app.route("/remove_collection/<int:collection_id>", methods=["GET", "POST"])
+def remove_collection(collection_id):
+    require_login()
+    collection = get_own_collection(collection_id)
+
+    if request.method == "GET":
+        return render_template("remove_collection.html", collection=collection)
+
+    if request.method == "POST":
+        check_csrf()
+        draft = session.get("collection_draft")
+        if "remove" in request.form:
+            photo_collections.remove_collection(collection_id)
+            if draft and draft["collection_id"] == collection_id:
+                del session["collection_draft"]
+            return redirect("/my_collections")
+        else:
+            if draft and draft["collection_id"] == collection_id:
+                return redirect("/collection_draft")
+            return redirect("/collection/" + str(collection_id))
 
 @app.route("/tag/<int:tag_id>")
 def show_tag(tag_id):
@@ -297,7 +508,9 @@ def remove_photo(photo_id):
     photo = get_own_photo(photo_id)
 
     if request.method == "GET":
-        return render_template("remove_photo.html", photo=photo)
+        single_photo_collections = photo_collections.get_single_photo_collections(photo_id)
+        return render_template("remove_photo.html", photo=photo,
+                               collections=single_photo_collections)
 
     if request.method == "POST":
         check_csrf()
@@ -358,4 +571,5 @@ def logout():
         del session["user_id"]
         del session["username"]
         del session["csrf_token"]
+    session.pop("collection_draft", None)
     return redirect("/")

@@ -41,7 +41,8 @@ CREATE TABLE collections (
     id INTEGER PRIMARY KEY,
     user_id INTEGER REFERENCES users,
     title TEXT,
-    description TEXT
+    description TEXT,
+    date_time_added TEXT
 );
 
 CREATE TABLE collection_photos (
@@ -57,3 +58,6 @@ CREATE INDEX idx_photos_added ON photos (date_time_added);
 CREATE INDEX idx_tag_photos ON photo_tags (tag_id);
 CREATE INDEX idx_photo_comments ON comments (photo_id);
 CREATE INDEX idx_collection_photos ON collection_photos (collection_id);
+CREATE INDEX idx_photo_collections ON collection_photos (photo_id);
+CREATE INDEX idx_user_collections ON collections (user_id);
+CREATE INDEX idx_collections_added ON collections (date_time_added);

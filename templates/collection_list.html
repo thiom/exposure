@@ -1,0 +1,16 @@
+<div class="collection-list{% if collections | length == 1 %} single{% endif %}">
+  {% for collection in collections %}
+  <a href="/collection/{{ collection.id }}" class="collection-card">
+    <img src="/image/{{ collection.cover_id }}" alt="{{ collection.title }}" loading="lazy" />
+    <span class="collection-title">{{ collection.title }}</span>
+    {% if collection.description %}
+    <span class="collection-description">{{ collection.description }}</span>
+    {% endif %}
+    {% if show_user %}
+    <span class="collection-meta">by {{ collection.username }}</span>
+    {% else %}
+    <span class="collection-meta">{{ collection.date_time_added | show_date }}</span>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>

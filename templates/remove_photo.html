@@ -7,6 +7,14 @@
   <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" class="thumbnail" />
   <h1>delete photo</h1>
   <p>Are you sure you want to delete this photo?</p>
+  {% if collections %}
+  <p>This photo is the only photo in the following collections, so they will be deleted too:</p>
+  <ul>
+    {% for collection in collections %}
+    <li><a href="/collection/{{ collection.id }}">{{ collection.title }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
   <form action="/remove_photo/{{ photo.id }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" name="remove" value="delete photo" class="danger" />

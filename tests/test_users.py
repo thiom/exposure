@@ -96,3 +96,13 @@ class TestLogin(BaseTestCase):
         response = self.client.get("/")
         self.assertIn(b"log out", response.data)
         self.assertIn(b"my photos", response.data)
+
+    def test_own_links_are_left_of_log_out(self):
+        self.login("maija")
+        data = self.client.get("/").data.decode()
+        right = data[data.index('class="nav-right"'):data.index("</nav>")]
+        left = data[data.index('class="nav-left"'):data.index('class="nav-center"')]
+        self.assertIn('href="/latest"', left)
+        self.assertNotIn('href="/my_photos"', left)
+        self.assertLess(right.index('href="/my_photos"'), right.index('href="/my_collections"'))
+        self.assertLess(right.index('href="/my_collections"'), right.index('href="/logout"'))

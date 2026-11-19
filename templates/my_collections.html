@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}My collections{% endblock %}
+
+{% block content %}
+<div class="my-collections{% if collections | length == 1 %} single{% endif %}">
+  <a href="/new_collection" class="add-new" title="add new collection"><span class="hidden-label">add new collection</span></a>
+  {% include "collection_list.html" %}
+</div>
+
+{% if not collections %}
+<p class="empty">You have not created any collections yet.</p>
+{% endif %}
+{% endblock %}

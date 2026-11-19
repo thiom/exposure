@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}Delete collection{% endblock %}
+
+{% block content %}
+<div class="narrow">
+  <h1>delete collection</h1>
+  <p>Are you sure you want to delete the collection <strong>{{ collection.title }}</strong>?
+     The photos in it will not be deleted.</p>
+  <form action="/remove_collection/{{ collection.id }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <input type="submit" name="remove" value="delete collection" class="danger" />
+    <input type="submit" name="back" value="cancel" />
+  </form>
+</div>
+{% endblock %}

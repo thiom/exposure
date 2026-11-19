@@ -225,7 +225,13 @@ class TestPhotoLists(BaseTestCase):
         response = self.client.get("/my_photos")
         self.assertIn(b"/image/" + str(own_id).encode() + b'"', response.data)
         self.assertNotIn(b"/image/" + str(other_id).encode() + b'"', response.data)
-        self.assertIn(b'href="/new_photo"', response.data)
+        self.assertIn(b'href="/new_photo" class="add-new"', response.data)
+        self.assertNotIn(b"add new</a>", response.data)
+
+    def test_my_photos_add_button_without_photos(self):
+        response = self.client.get("/my_photos")
+        self.assertIn(b'href="/new_photo" class="add-new"', response.data)
+        self.assertIn(b"not added any photos", response.data)
 
     def test_my_photos_requires_login(self):
         self.logout()

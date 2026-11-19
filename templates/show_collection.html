@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ collection.title }}{% endblock %}
+
+{% block content %}
+<header class="collection-header">
+  <h1>{{ collection.title }}</h1>
+  {% if collection.description %}
+  <p class="collection-description">{{ collection.description }}</p>
+  {% endif %}
+  {% if session.user_id == collection.user_id %}
+  <a href="/edit_collection/{{ collection.id }}" class="button">edit</a>
+  {% endif %}
+</header>
+
+{% include "photo_list.html" %}
+
+<p class="collection-footer">{{ collection.date_time_added | show_date }}</p>
+{% endblock %}

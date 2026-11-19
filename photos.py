@@ -1,6 +1,7 @@
 import re
 
 import db
+import photo_collections
 import tags
 
 MAX_TEXT_LENGTH = 50
@@ -148,6 +149,7 @@ def remove_photo(photo_id):
     sql = "DELETE FROM photos WHERE id = ?"
     db.execute(sql, [photo_id])
     tags.remove_unused_tags()
+    photo_collections.remove_empty_collections()
 
 def find_photos(query):
     sql = """SELECT DISTINCT photos.id, photos.description, photos.date_time_added

@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block title %}{% if draft.collection_id %}Edit collection{% else %}New collection{% endif %}{% endblock %}
+
+{% block content %}
+<form action="/update_collection_draft" method="post" class="collection-form">
+  <div class="collection-form-top form">
+    <h1>{% if draft.collection_id %}edit collection{% else %}new collection{% endif %}</h1>
+    <p>
+      <label for="title">title</label>
+      <input type="text" name="title" id="title" maxlength="30" value="{{ draft.title }}" required />
+    </p>
+    <p>
+      <label for="description">description (optional)</label>
+      <textarea name="description" id="description" rows="3" maxlength="200">{{ draft.description }}</textarea>
+    </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+    <div class="form-buttons">
+      <span>
+        <button type="submit" name="save" value="1">{% if draft.collection_id %}save{% else %}create collection{% endif %}</button>
+        {% if draft.collection_id %}
+        <a href="/remove_collection/{{ draft.collection_id }}" class="button danger">delete collection</a>
+        {% endif %}
+      </span>
+      <a href="{{ cancel_url }}" class="button">cancel</a>
+    </div>
+  </div>
+
+  <section id="selected" class="draft-section">
+    <h2>in this collection ({{ selected | length }} / {{ max_photos }})</h2>
+    {% if selected %}
+    <ol class="selected-photos">
+      {% for photo in selected %}
+      <li>
+        <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" loading="lazy" />
+        <span class="selected-buttons">
+          <button type="submit" name="up" value="{{ photo.id }}" formnovalidate
+                  {% if loop.first %}disabled{% endif %} title="move up">&uarr;</button>
+          <button type="submit" name="down" value="{{ photo.id }}" formnovalidate
+                  {% if loop.last %}disabled{% endif %} title="move down">&darr;</button>
+          <button type="submit" name="remove" value="{{ photo.id }}" formnovalidate
+                  class="link-button">remove</button>
+        </span>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="muted">Add at least one photo from your photos below.</p>
+    {% endif %}
+  </section>
+
+  <section class="draft-section">
+    <h2>your photos</h2>
+    {% if available %}
+    <div class="pick-list">
+      {% for photo in available %}
+      <div class="pick-row">
+        <img src="/image/{{ photo.id }}" alt="{{ photo.description }}" loading="lazy" />
+        <div>
+          <button type="submit" name="add" value="{{ photo.id }}" formnovalidate class="add-plus"
+                  title="add to collection"><span class="hidden-label">add</span></button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% elif has_photos %}
+    <p class="muted">All your photos are in this collection.</p>
+    {% else %}
+    <p class="muted">You have no photos yet. <a href="/new_photo">Add a photo</a> first.</p>
+    {% endif %}
+  </section>
+</form>
+{% endblock %}
