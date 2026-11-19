@@ -20,8 +20,9 @@ kirjautumista. Kirjautunut käyttäjä voi myös kommentoida kenen tahansa kuvia
 | Riippuvuudet | Vain Flask (`pip install flask`) | Kurssin vaatimus: ei muita asennettavia Python-kirjastoja |
 | Käyttöliittymä | HTML-sivut (Jinja), oma CSS | Kurssin vaatimus: ei JavaScriptiä eikä CSS-kirjastoja |
 | Testit | `unittest` + Flaskin testiasiakas | Tulevat Pythonin ja Flaskin mukana, eivät vaadi lisäkirjastoja |
+| Selaintestit | Robot Framework + Browser-kirjasto (Playwright, Chromium) | Testaa sovellusta oikealla selaimella. Kehitystyökalu (ks. luku 14) |
 | Koodin tyyli | Pylint, asetukset `.pylintrc`:ssä | Kehitystyökalu, jota sovellus ei käytä ajon aikana (ks. luku 14) |
-| CI | GitHub Actions | Testit ja pylint ajetaan jokaisella pushilla (ks. luku 14) |
+| CI | GitHub Actions | Testit, Robot-testit ja pylint ajetaan jokaisella pushilla (ks. luku 14) |
 | Salasanat | `werkzeug.security` (hajautus) | Tulee Flaskin mukana |
 | Sumea tagihaku | `difflib.SequenceMatcher` | Pythonin standardikirjasto |
 
@@ -46,8 +47,9 @@ schema.sql              tietokannan taulut ja indeksit
 templates/              Jinja-sivupohjat (ks. luku 13)
 static/main.css         kaikki tyylit
 tests/                  unittest-testit (ks. luku 14)
-run.sh                  käynnistys yhdellä komennolla (ei versionhallinnassa)
-test.sh                 testien ajo yhdellä komennolla (ei versionhallinnassa)
+story_tests/            Robot Framework -testit, testipalvelin ja testikuva
+run.sh                  käynnistys yhdellä komennolla
+test.sh                 testien ajo yhdellä komennolla
 database.db             kehitystietokanta (ei versionhallinnassa)
 test_photos/            testikuvat käsin kokeilua varten (ei versionhallinnassa)
 ```
@@ -82,8 +84,16 @@ standardikirjaston `collections`-moduulin, ja silloin Flask lakkaisi toimimasta.
   muille kentille. Suurempi pyyntö hylätään jo ennen kuin sitä luetaan.
 * `run.sh` luo tarvittaessa virtuaaliympäristön (`venv/`), asentaa Flaskin, luo
   `database.db`:n `schema.sql`:stä, jos tiedostoa ei ole, ja käynnistää
-  komennon `flask run`. Lisäargumentit välitetään Flaskille (esim.
-  `./run.sh --debug`).
+  komennon `flask run` porttiin 5001 (muutettavissa muuttujalla `PORT`).
+  Oletusportti ei ole Flaskin 5000, koska macOS:n AirPlay-vastaanotin varaa
+  sen. Lisäargumentit välitetään Flaskille (esim. `./run.sh --debug`).
+* **Skriptit** (`run.sh`, `test.sh`) on tehty talj-projektin skriptien
+  mallin mukaan, ja ne toimivat macOS:llä ja Linuxilla. Ne ovat bashia
+  (`set -euo pipefail`) ja toimivat myös macOS:n vanhalla bash 3.2:lla. Ne
+  käyttävät vain Pythonin `venv`:iä ja `pip`:iä, eivät esim. uv:tä, koska
+  kurssin ohje käyttää niitä. Puuttuvista ohjelmista (`python3`, `sqlite3`,
+  `curl`), liian vanhasta Pythonista ja puuttuvasta `python3-venv`-paketista
+  annetaan selkeä virheilmoitus.
 
 ## 5. Tietokanta
 
@@ -426,10 +436,13 @@ listauksesta. Ilman JavaScriptiä jokainen painallus on lomakkeen lähetys, jote
 ## 14. Testaus
 
 Testit ovat `unittest`-testejä, jotka käyttävät Flaskin testiasiakasta.
-`./test.sh` ajaa kaikki testit ja sen jälkeen pylintin, ja se päättyy virheeseen, jos
-jompikumpi epäonnistuu. `./test.sh lint` ajaa vain pylintin ja
-`./test.sh tests.test_comments` vain yhden testitiedoston. Skripti asentaa
-tarvittaessa Flaskin ja pylintin virtuaaliympäristöön.
+`./test.sh` ajaa yksikkötestit, Robot-testit ja pylintin, ja se päättyy
+virheeseen, jos jokin niistä epäonnistuu. `./test.sh unit`, `./test.sh robot`
+ja `./test.sh lint` ajavat vain yhden osan ja `./test.sh tests.test_comments`
+yhden testitiedoston. Jokainen osa asentaa virtuaaliympäristöön vain
+tarvitsemansa työkalut, joten esim. `./test.sh unit` ei lataa Robot
+Frameworkia eikä selainta. Osat vaativat eri Python-version: yksikkötestit
+3.9, pylint 3.10 ja Robot-testit 3.11 (Browser-kirjasto).
 Ilman skriptiä: `python3 -m unittest`.
 
 | Tiedosto | Kattaa |
@@ -456,9 +469,50 @@ Ilman skriptiä: `python3 -m unittest`.
   vain, että oikeat luokat ja elementit ovat sivulla. Ulkoasu on tarkistettu
   käsin kuvakaappauksista.
 
+### Robot Framework (`story_tests/`)
+
+Selaintestit käyttävät sovellusta oikealla selaimella (Chromium) kuten
+käyttäjä: ne täyttävät lomakkeita, lähettävät kuvatiedoston ja klikkaavat
+painikkeita. Rakenne on sama kuin bibtexgen-projektissa.
+
+| Tiedosto | Kattaa |
+| --- | --- |
+| `resource.robot` | Yhteiset muuttujat ja avainsanat: selaimen avaus, tietokannan nollaus, rekisteröinti, kirjautuminen, kuvan lisäys |
+| `login.robot` | Rekisteröinti, varattu tunnus, väärä salasana, kirjautuminen ja uloskirjautuminen |
+| `photos.robot` | Kuvan lisäys tietoineen ja tageineen, kuvauksen muokkaus, kuvan poisto, haku ja back-painike, my photos -sivun plus-painikkeen sijainti |
+| `comments.robot` | Toisen käyttäjän kuvan kommentointi, kirjautumattoman käyttäjän `log in to comment` |
+| `collections.robot` | Kokoelman luonti plus-painikkeilla, luonti ilman kuvia, järjestyksen ja otsikon muutos, näkyminen latest-sivulla ja haussa, kokoelman poisto |
+
+* **Testipalvelin** `story_tests/server.py` käynnistää sovelluksen omalla
+  tietokannallaan `robot_test.db`. Se lisää reitin `/reset_db`, joka luo
+  tietokannan uudelleen ja tyhjentää istunnon. Jokainen testi alkaa sillä
+  (`Reset Application`), joten testit eivät riipu toisistaan. Reittiä ei ole
+  itse sovelluksessa, joten testien nollaustoiminto ei voi päätyä
+  tuotantokäyttöön.
+* **Testikuva** `story_tests/photo.jpg` on pieni, itse generoitu liukuväri
+  (11 kt). Kansio `test_photos/` ei ole versionhallinnassa, joten CI
+  tarvitsee oman kuvan.
+* Ulkoasun sijainteja tarkistetaan elementtien rajauslaatikoilla
+  (`Get BoundingBox`). Esimerkiksi my photos -sivulla tarkistetaan, että plus
+  on `latest`-linkin ja ensimmäisen kuvan yläreunan linjassa eikä osu kuvan
+  päälle.
+* Browser-kirjasto käyttää Node.js:ää. Paketti
+  `robotframework-browser-batteries` tuo oman Node.js-ympäristönsä, joten
+  testit eivät riipu koneelle asennetun Node.js:n versiosta.
+* Paikallisesti testit ajetaan komennolla `./test.sh robot`. Skripti asentaa
+  testiselaimen, käynnistää testipalvelimen taustalle portissa 5002, odottaa
+  että se vastaa, ajaa testit ja pysäyttää palvelimen aina lopuksi, myös
+  testien epäonnistuessa. Jos portti on jo käytössä, skripti pysähtyy
+  virheilmoitukseen. Portin voi vaihtaa muuttujalla `PORT`. Portti on eri
+  kuin `run.sh`:n 5001, joten testit voi ajaa sovelluksen ollessa käynnissä.
+* Linuxilla Chromium voi tarvita järjestelmäkirjastoja. `WITH_DEPS=1
+  ./test.sh robot` asentaa ne (`rfbrowser install --with-deps`, vaatii
+  sudo-oikeudet). Jos Robot-testit epäonnistuvat Linuxilla ilman tätä,
+  skripti neuvoo kokeilemaan sitä.
+
 ### Pylint
 
-`pylint *.py tests` tarkistaa koodin tyylin (`pip install pylint`). Pylint on
+`pylint *.py tests story_tests` tarkistaa koodin tyylin (`pip install pylint`). Pylint on
 vain kehitystyökalu, joten sovelluksen ainoa ajonaikainen riippuvuus on
 edelleen Flask. `.pylintrc` pitää oletussäännöt käytössä ja poistaa niistä
 vain ne, jotka kurssin esimerkkisovelluksen pylint-raportissa todetaan
@@ -480,12 +534,14 @@ asetuksilla arvosanan 10/10.
 ### GitHub Actions
 
 `.github/workflows/ci.yaml` ajetaan jokaisella pushilla (kaikki haarat) ja
-pull requestilla. Työ asentaa Python 3.12:n, Flaskin ja pylintin ja ajaa sitten
-komennot `python -m unittest -v` ja `pylint *.py tests`. Jos testit
-epäonnistuvat, pylintiä ei ajeta, ja ajo merkitään epäonnistuneeksi.
+pull requestilla. Työ asentaa Python 3.12:n ja ajaa samat skriptit kuin
+paikallisesti: `./test.sh unit`, `WITH_DEPS=1 ./test.sh robot` ja
+`./test.sh lint`. Jos jokin vaihe epäonnistuu, myöhempiä
+vaiheita ei ajeta, ja ajo merkitään epäonnistuneeksi. Silloin Robotin
+raportti (`log.html`, `report.html`, `output.xml`) ja palvelimen loki
+tallennetaan artefaktiksi `robot-report`.
 
-`test.sh` ei ole versionhallinnassa, joten työ ajaa komennot suoraan.
-Kansio `test_photos/` ei myöskään ole versionhallinnassa, joten oikeaa kuvaa
+Kansio `test_photos/` ei ole versionhallinnassa, joten oikeaa kuvaa
 käyttävä testi ohitetaan CI:ssä. Tietokanta luodaan testeissä aina
 `schema.sql`:stä, eikä `database.db`:tä tarvita.
 

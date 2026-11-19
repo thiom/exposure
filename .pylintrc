@@ -1,4 +1,4 @@
-# Pylint configuration. Run with: pylint *.py tests
+# Pylint configuration. Run with: pylint *.py tests story_tests
 #
 # The defaults are kept except for the style choices below, which follow the
 # course example application (see its pylint-report.md).

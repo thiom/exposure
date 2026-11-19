@@ -17,11 +17,24 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
-        run: pip install flask pylint
+      - name: Run unit tests
+        run: ./test.sh unit
 
-      - name: Run tests
-        run: python -m unittest -v
+      - name: Run robot tests
+        run: ./test.sh robot
+        env:
+          WITH_DEPS: 1
 
       - name: Run pylint
-        run: pylint *.py tests
+        run: ./test.sh lint
+
+      - name: Upload robot report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-report
+          path: |
+            log.html
+            report.html
+            output.xml
+            robot_server.log
