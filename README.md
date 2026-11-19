@@ -1,5 +1,7 @@
 # exposure
 
+[![CI](https://github.com/thiom/exposure/actions/workflows/ci.yaml/badge.svg)](https://github.com/thiom/exposure/actions/workflows/ci.yaml)
+
 ## Lyhyt kuvaus
 
 Exposure on sovellus, joka on tehty valokuvien jakamiseen. Monista muista

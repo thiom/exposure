@@ -21,6 +21,7 @@ kirjautumista. Kirjautunut käyttäjä voi myös kommentoida kenen tahansa kuvia
 | Käyttöliittymä | HTML-sivut (Jinja), oma CSS | Kurssin vaatimus: ei JavaScriptiä eikä CSS-kirjastoja |
 | Testit | `unittest` + Flaskin testiasiakas | Tulevat Pythonin ja Flaskin mukana, eivät vaadi lisäkirjastoja |
 | Koodin tyyli | Pylint, asetukset `.pylintrc`:ssä | Kehitystyökalu, jota sovellus ei käytä ajon aikana (ks. luku 14) |
+| CI | GitHub Actions | Testit ja pylint ajetaan jokaisella pushilla (ks. luku 14) |
 | Salasanat | `werkzeug.security` (hajautus) | Tulee Flaskin mukana |
 | Sumea tagihaku | `difflib.SequenceMatcher` | Pythonin standardikirjasto |
 
@@ -41,6 +42,7 @@ tags.py                 tagien normalisointi, lisäys, poisto ja sumea haku
 photo_collections.py    kokoelmat ja niiden kuvat, kokoelmahaku
 schema.sql              tietokannan taulut ja indeksit
 .pylintrc               pylintin asetukset
+.github/workflows/ci.yaml  GitHub Actions: testit ja pylint
 templates/              Jinja-sivupohjat (ks. luku 13)
 static/main.css         kaikki tyylit
 tests/                  unittest-testit (ks. luku 14)
@@ -474,6 +476,18 @@ Lisäksi reittien sallittua haarojen, `return`-lauseiden ja parametrien määrä
 on nostettu hieman (15, 8 ja 6), koska lomakereitit tarkistavat useita kenttiä.
 Rivin enimmäispituus on oletuksen mukainen 100 merkkiä. Koodi saa nykyisillä
 asetuksilla arvosanan 10/10.
+
+### GitHub Actions
+
+`.github/workflows/ci.yaml` ajetaan jokaisella pushilla (kaikki haarat) ja
+pull requestilla. Työ asentaa Python 3.12:n, Flaskin ja pylintin ja ajaa sitten
+komennot `python -m unittest -v` ja `pylint *.py tests`. Jos testit
+epäonnistuvat, pylintiä ei ajeta, ja ajo merkitään epäonnistuneeksi.
+
+`test.sh` ei ole versionhallinnassa, joten työ ajaa komennot suoraan.
+Kansio `test_photos/` ei myöskään ole versionhallinnassa, joten oikeaa kuvaa
+käyttävä testi ohitetaan CI:ssä. Tietokanta luodaan testeissä aina
+`schema.sql`:stä, eikä `database.db`:tä tarvita.
 
 ## 15. Päätökset
 
