@@ -1,4 +1,4 @@
-docs/
+private/
 __pycache__
 venv
 database.db

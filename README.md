@@ -8,6 +8,10 @@ ominaisuuksia, jotka tukevat ammattimaisen tai vakavasti valokuvaukseen suhtautu
 käyttäjän tarpeita. Erityisesti, pyrkimys on tarjota visuaalisesti minimalistinen
 alusta erilaisten valokuvakokoelmien luomiseen.
 
+## Arkkitehtuuri
+
+[Arkkitehtuurikuvaus](docs/arkkitehtuurikuvaus/README.md)
+
 ## Sovelluksen toiminnot
 
 * Käyttäjä pystyy luomaan tunnuksen ja kirjautumaan sisään sovellukseen.
