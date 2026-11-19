@@ -10,7 +10,7 @@ alusta erilaisten valokuvakokoelmien luomiseen.
 
 ## Arkkitehtuuri
 
-Katso [arkkitehtuurikuvaus](docs/arkkitehtuurikuvaus/README.md)
+Katso [arkkitehtuurikuvaus](docs/arkkitehtuurikuvaus/README.md).
 
 ## Sovelluksen toiminnot
 
