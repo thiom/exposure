@@ -282,8 +282,9 @@ class TestCollectionAccess(CollectionTestCase):
         collection_id = self.create_collection([self.add_photo()])
         self.logout()
         self.register("uolevi")
-        self.assertEqual(self.client.get("/edit_collection/" + str(collection_id)).status_code, 403)
-        self.assertEqual(self.client.get("/remove_collection/" + str(collection_id)).status_code, 403)
+        for url in ["/edit_collection/", "/remove_collection/"]:
+            response = self.client.get(url + str(collection_id))
+            self.assertEqual(response.status_code, 403, msg=url)
         response = self.post("/remove_collection/" + str(collection_id), {"remove": "x"})
         self.assertEqual(response.status_code, 403)
         self.assertEqual(self.collection_count(), 1)
@@ -315,8 +316,8 @@ class TestEditCollection(CollectionTestCase):
         response = self.client.get("/collection_draft")
         self.assertIn(b"edit collection", response.data)
         self.assertIn(b'value="Summer"', response.data)
-        self.assertIn(b'href="/collection/' + str(collection_id).encode() + b'" class="button">cancel',
-                      response.data)
+        cancel = 'href="/collection/' + str(collection_id) + '" class="button">cancel'
+        self.assertIn(cancel.encode(), response.data)
         self.assertIn(b"delete collection", response.data)
 
         self.update_draft("Autumn", "Leaves", remove=first)

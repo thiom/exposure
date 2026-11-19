@@ -20,6 +20,7 @@ kirjautumista. Kirjautunut käyttäjä voi myös kommentoida kenen tahansa kuvia
 | Riippuvuudet | Vain Flask (`pip install flask`) | Kurssin vaatimus: ei muita asennettavia Python-kirjastoja |
 | Käyttöliittymä | HTML-sivut (Jinja), oma CSS | Kurssin vaatimus: ei JavaScriptiä eikä CSS-kirjastoja |
 | Testit | `unittest` + Flaskin testiasiakas | Tulevat Pythonin ja Flaskin mukana, eivät vaadi lisäkirjastoja |
+| Koodin tyyli | Pylint, asetukset `.pylintrc`:ssä | Kehitystyökalu, jota sovellus ei käytä ajon aikana (ks. luku 14) |
 | Salasanat | `werkzeug.security` (hajautus) | Tulee Flaskin mukana |
 | Sumea tagihaku | `difflib.SequenceMatcher` | Pythonin standardikirjasto |
 
@@ -39,6 +40,7 @@ photos.py               kuvat, kuvien tiedot (kamera ym.), kommentit, kuvahaku
 tags.py                 tagien normalisointi, lisäys, poisto ja sumea haku
 photo_collections.py    kokoelmat ja niiden kuvat, kokoelmahaku
 schema.sql              tietokannan taulut ja indeksit
+.pylintrc               pylintin asetukset
 templates/              Jinja-sivupohjat (ks. luku 13)
 static/main.css         kaikki tyylit
 tests/                  unittest-testit (ks. luku 14)
@@ -422,7 +424,10 @@ listauksesta. Ilman JavaScriptiä jokainen painallus on lomakkeen lähetys, jote
 ## 14. Testaus
 
 Testit ovat `unittest`-testejä, jotka käyttävät Flaskin testiasiakasta.
-`./test.sh` ajaa kaikki ja `./test.sh tests.test_comments` yhden tiedoston.
+`./test.sh` ajaa kaikki testit ja sen jälkeen pylintin, ja se päättyy virheeseen, jos
+jompikumpi epäonnistuu. `./test.sh lint` ajaa vain pylintin ja
+`./test.sh tests.test_comments` vain yhden testitiedoston. Skripti asentaa
+tarvittaessa Flaskin ja pylintin virtuaaliympäristöön.
 Ilman skriptiä: `python3 -m unittest`.
 
 | Tiedosto | Kattaa |
@@ -448,6 +453,27 @@ Ilman skriptiä: `python3 -m unittest`.
 * Ulkoasua (sijainnit, koot) ei testata automaattisesti. Testit tarkistavat
   vain, että oikeat luokat ja elementit ovat sivulla. Ulkoasu on tarkistettu
   käsin kuvakaappauksista.
+
+### Pylint
+
+`pylint *.py tests` tarkistaa koodin tyylin (`pip install pylint`). Pylint on
+vain kehitystyökalu, joten sovelluksen ainoa ajonaikainen riippuvuus on
+edelleen Flask. `.pylintrc` pitää oletussäännöt käytössä ja poistaa niistä
+vain ne, jotka kurssin esimerkkisovelluksen pylint-raportissa todetaan
+tietoisiksi tyylivalinnoiksi:
+
+| Poistettu sääntö | Peruste |
+| --- | --- |
+| `missing-*-docstring` | Docstring-kommentteja ei käytetä |
+| `no-else-return` | `else`-haara `return`in jälkeen näyttää molemmat vaihtoehdot selvemmin |
+| `inconsistent-return-statements` | GET/POST-reitit palauttavat arvon kummassakin haarassa, eikä Flask päästä muita metodeja funktioon asti |
+| `dangerous-default-value` | Oletusarvoa `params=[]` ei muuteta funktiossa |
+| vakioiden nimeäminen (`const-naming-style=any`) | `config.py`:n asetukset ovat pienillä kirjaimilla (`config.secret_key`) |
+
+Lisäksi reittien sallittua haarojen, `return`-lauseiden ja parametrien määrää
+on nostettu hieman (15, 8 ja 6), koska lomakereitit tarkistavat useita kenttiä.
+Rivin enimmäispituus on oletuksen mukainen 100 merkkiä. Koodi saa nykyisillä
+asetuksilla arvosanan 10/10.
 
 ## 15. Päätökset
 

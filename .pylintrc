@@ -1,0 +1,37 @@
+# Pylint configuration. Run with: pylint *.py tests
+#
+# The defaults are kept except for the style choices below, which follow the
+# course example application (see its pylint-report.md).
+
+[MAIN]
+ignore=venv
+
+[MESSAGES CONTROL]
+disable=
+    # docstrings are not used in this project
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    # an else branch after return shows both outcomes explicitly
+    no-else-return,
+    # routes with methods=["GET", "POST"] return in both branches;
+    # Flask rejects other methods before the function is called
+    inconsistent-return-statements,
+    # params=[] in db.py and test helpers: the default is never modified
+    dangerous-default-value
+
+[BASIC]
+# module level settings in config.py are written in lowercase
+# (app.secret_key = config.secret_key)
+const-naming-style=any
+
+[FORMAT]
+max-line-length=100
+
+[DESIGN]
+# route functions validate several form fields, so allow a little more
+# than the defaults (12 branches, 6 returns, 5 arguments)
+max-branches=15
+max-returns=8
+max-args=6
+max-positional-arguments=6

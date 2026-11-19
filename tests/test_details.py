@@ -38,9 +38,18 @@ class TestParseText(unittest.TestCase):
         with self.assertRaises(ValueError):
             photos.parse_text("a" * 51)
 
+def parse_focal_length(value):
+    return photos.parse_number(value, 1, 1.0, 1000.0)
+
+def parse_aperture(value):
+    return photos.parse_number(value, 2, 1.0, 50.0)
+
+def parse_shutter_speed(value):
+    return photos.parse_number(value, 2, 0.01, 5000.0)
+
 class TestParseNumber(unittest.TestCase):
     def test_focal_length(self):
-        parse = lambda value: photos.parse_number(value, 1, 1.0, 1000.0)
+        parse = parse_focal_length
         self.assertEqual(parse("50"), 50.0)
         self.assertEqual(parse("24"), 24.0)
         self.assertEqual(parse("1.0"), 1.0)
@@ -53,7 +62,7 @@ class TestParseNumber(unittest.TestCase):
                 parse(value)
 
     def test_aperture(self):
-        parse = lambda value: photos.parse_number(value, 2, 1.0, 50.0)
+        parse = parse_aperture
         self.assertEqual(parse("1.00"), 1.0)
         self.assertEqual(parse("2.8"), 2.8)
         self.assertEqual(parse("1.41"), 1.41)
@@ -63,7 +72,7 @@ class TestParseNumber(unittest.TestCase):
                 parse(value)
 
     def test_shutter_speed(self):
-        parse = lambda value: photos.parse_number(value, 2, 0.01, 5000.0)
+        parse = parse_shutter_speed
         self.assertEqual(parse("0.01"), 0.01)
         self.assertEqual(parse("250"), 250.0)
         self.assertEqual(parse("5000.00"), 5000.0)

@@ -10,7 +10,7 @@ alusta erilaisten valokuvakokoelmien luomiseen.
 
 ## Arkkitehtuuri
 
-[Arkkitehtuurikuvaus](docs/arkkitehtuurikuvaus/README.md)
+Katso [arkkitehtuurikuvaus](docs/arkkitehtuurikuvaus/README.md)
 
 ## Sovelluksen toiminnot
 
@@ -76,3 +76,18 @@ $ python3 -m unittest
 ```
 
 Mikäli kansio `test_photos` löytyy, testit lähettävät sovellukseen myös sen sisältämän oikean kuvan.
+
+## Koodin laadun tarkistus
+
+Koodin tyyli tarkistetaan [Pylint](https://pylint.readthedocs.io/)-työkalulla. Pylint on vain
+kehitystyökalu, eikä sovellus itse käytä sitä. Asenna se virtuaaliympäristöön ja aja tarkistus
+projektin juurikansiossa:
+
+```
+$ pip install pylint
+$ pylint *.py tests
+```
+
+Asetukset ovat tiedostossa `.pylintrc`. Pylintin oletussäännöistä on poistettu käytöstä vain
+tietoiset tyylivalinnat (esimerkiksi docstring-kommenttien puuttuminen), ja jokaiselle on
+perustelu tiedostossa.

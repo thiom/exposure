@@ -1,5 +1,6 @@
 import io
 import os
+import shutil
 import sqlite3
 import tempfile
 import unittest
@@ -17,9 +18,9 @@ FAKE_JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 100
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
+        self.temp_dir = tempfile.mkdtemp()
         self.original_database = config.database
-        config.database = os.path.join(self.temp_dir.name, "test.db")
+        config.database = os.path.join(self.temp_dir, "test.db")
 
         con = sqlite3.connect(config.database)
         with open(os.path.join(ROOT_DIR, "schema.sql"), encoding="utf-8") as file:
@@ -31,7 +32,7 @@ class BaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         config.database = self.original_database
-        self.temp_dir.cleanup()
+        shutil.rmtree(self.temp_dir)
 
     def query(self, sql, params=[]):
         with app.app_context():

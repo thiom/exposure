@@ -28,27 +28,27 @@ def parse_details(form):
     details = {}
     try:
         details["camera"] = parse_text(form.get("camera", ""))
-    except ValueError:
-        raise ValueError("Camera can be at most 50 characters long")
+    except ValueError as error:
+        raise ValueError("Camera can be at most 50 characters long") from error
     try:
         details["lens"] = parse_text(form.get("lens", ""))
-    except ValueError:
-        raise ValueError("Lens can be at most 50 characters long")
+    except ValueError as error:
+        raise ValueError("Lens can be at most 50 characters long") from error
     try:
         details["focal_length"] = parse_number(form.get("focal_length", ""), 1, 1.0, 1000.0)
-    except ValueError:
+    except ValueError as error:
         raise ValueError("Focal length must be a number between 1.0 and 1000.0 "
-                         "with at most one decimal")
+                         "with at most one decimal") from error
     try:
         details["aperture"] = parse_number(form.get("aperture", ""), 2, 1.0, 50.0)
-    except ValueError:
+    except ValueError as error:
         raise ValueError("Aperture must be a number between 1.00 and 50.00 "
-                         "with at most two decimals")
+                         "with at most two decimals") from error
     try:
         details["shutter_speed"] = parse_number(form.get("shutter_speed", ""), 2, 0.01, 5000.0)
-    except ValueError:
+    except ValueError as error:
         raise ValueError("Shutter speed must be a number between 0.01 and 5000.00 "
-                         "with at most two decimals")
+                         "with at most two decimals") from error
     return details
 
 def add_photo(user_id, image, description, details, tag_titles):

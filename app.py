@@ -59,6 +59,14 @@ def get_own_collection(collection_id):
         abort(403)
     return collection
 
+def check_collection_limit(user_id):
+    count = photo_collections.user_collection_count(user_id)
+    if count < photo_collections.MAX_COLLECTIONS_PER_USER:
+        return True
+    flash("You have reached the maximum of "
+          + str(photo_collections.MAX_COLLECTIONS_PER_USER) + " collections")
+    return False
+
 def get_page_count(count):
     return max(math.ceil(count / PAGE_SIZE), 1)
 
@@ -162,10 +170,7 @@ def show_collection(collection_id):
 @app.route("/new_collection")
 def new_collection():
     require_login()
-    user_id = session["user_id"]
-    if photo_collections.user_collection_count(user_id) >= photo_collections.MAX_COLLECTIONS_PER_USER:
-        flash("You have reached the maximum of "
-              + str(photo_collections.MAX_COLLECTIONS_PER_USER) + " collections")
+    if not check_collection_limit(session["user_id"]):
         return redirect("/my_collections")
 
     session["collection_draft"] = {
@@ -247,10 +252,10 @@ def update_collection_draft():
         move = "up" if "up" in request.form else "down"
         photo_id = parse_id(request.form[move])
         if photo_id in photo_ids:
-            index = photo_ids.index(photo_id)
-            other = index - 1 if move == "up" else index + 1
+            position = photo_ids.index(photo_id)
+            other = position - 1 if move == "up" else position + 1
             if 0 <= other < len(photo_ids):
-                photo_ids[index], photo_ids[other] = photo_ids[other], photo_ids[index]
+                photo_ids[position], photo_ids[other] = photo_ids[other], photo_ids[position]
 
     session["collection_draft"] = draft
 
@@ -278,9 +283,7 @@ def save_collection_draft(draft):
         get_own_collection(collection_id)
         photo_collections.update_collection(collection_id, title, description, photo_ids)
     else:
-        if photo_collections.user_collection_count(user_id) >= photo_collections.MAX_COLLECTIONS_PER_USER:
-            flash("You have reached the maximum of "
-                  + str(photo_collections.MAX_COLLECTIONS_PER_USER) + " collections")
+        if not check_collection_limit(user_id):
             return redirect("/my_collections")
         collection_id = photo_collections.add_collection(user_id, title, description, photo_ids)
 
