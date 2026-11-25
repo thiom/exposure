@@ -153,6 +153,10 @@ form.inline {
 }
 
 /* log in and register buttons on the login page have the same width */
+.form input[type="submit"] + .button {
+  margin-left: 0.75rem;
+}
+
 input[type="submit"].login-button,
 .button.login-button {
   width: 6.5rem;

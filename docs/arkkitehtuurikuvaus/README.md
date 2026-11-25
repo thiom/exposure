@@ -484,7 +484,7 @@ painikkeita. Rakenne on sama kuin bibtexgen-projektissa.
 | Tiedosto | Kattaa |
 | --- | --- |
 | `resource.robot` | Yhteiset muuttujat ja avainsanat: selaimen avaus, tietokannan nollaus, rekisteröinti, kirjautuminen, kuvan lisäys |
-| `login.robot` | Rekisteröinti, varattu tunnus, eri salasanat, väärä salasana (syötteet säilyvät kentissä), kirjautuminen ja uloskirjautuminen |
+| `login.robot` | Rekisteröinti, varattu tunnus, eri salasanat, siirtyminen rekisteröintisivulta kirjautumissivulle, väärä salasana (syötteet säilyvät kentissä), kirjautuminen ja uloskirjautuminen |
 | `photos.robot` | Kuvan lisäys tietoineen ja tageineen, kuvauksen muokkaus, kuvan poisto, haku ja back-painike, my photos -sivun plus-painikkeen sijainti |
 | `comments.robot` | Toisen käyttäjän kuvan kommentointi, kirjautumattoman käyttäjän `log in to comment` |
 | `collections.robot` | Kokoelman luonti plus-painikkeilla, luonti ilman kuvia, järjestyksen ja otsikon muutos, näkyminen latest-sivulla ja haussa, kokoelman poisto |

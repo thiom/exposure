@@ -46,6 +46,16 @@ Sign up link in the top bar opens the registration page
     User Should Be Logged In
     Get Element Count  .nav-right >> text=sign up  ==  0
 
+Go to log in button is right of the create account button
+    Go To  ${REGISTER_URL}
+    ${create}=  Get BoundingBox  input[value="create account"]
+    ${log_in}=  Get BoundingBox  a >> text=go to log in
+    Should Be True  ${create}[x] + ${create}[width] + 10 < ${log_in}[x]
+    Should Be True  abs(${create}[y] - ${log_in}[y]) < 1
+    Should Be True  abs(${create}[height] - ${log_in}[height]) < 1
+    Click  a >> text=go to log in
+    Get Url  ==  ${LOGIN_URL}
+
 Log in and register buttons are equally wide
     Go To  ${LOGIN_URL}
     ${log_in}=  Get BoundingBox  input[value="log in"]

@@ -86,6 +86,15 @@ class TestRegister(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'action="/create"', response.data)
 
+    def test_register_page_has_log_in_button(self):
+        html = self.client.get("/register").data.decode()
+        self.assertIn('<a href="/login" class="button">go to log in</a>', html)
+        self.assertLess(html.index('value="create account"'), html.index("go to log in"))
+
+    def test_failed_registration_has_log_in_button(self):
+        response = self.register("maija", PASSWORD, PASSWORD + "x")
+        self.assertIn(b"go to log in", response.data)
+
 class TestLogin(BaseTestCase):
     def setUp(self):
         super().setUp()
