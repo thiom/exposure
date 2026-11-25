@@ -6,6 +6,7 @@
 <div class="my-photos{% if not photos %} no-items{% endif %}">
   <a href="/new_photo" class="add-new" title="add new photo"><span class="hidden-label">add new photo</span></a>
   {% if photos %}
+  <p class="item-count">{{ photos | length }} {% if photos | length == 1 %}photo{% else %}photos{% endif %}</p>
   {% include "photo_list.html" %}
   {% endif %}
 </div>

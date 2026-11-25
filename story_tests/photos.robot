@@ -63,6 +63,13 @@ Without photos the text is centered below the plus button
     Should Be True  ${plus}[y] + ${plus}[height] <= ${text}[y]
     Get Style  .empty  text-align  ==  center
 
+Photo count on my photos is mirrored with the plus button
+    Add Photo
+    Add Photo
+    Go To  ${HOME_URL}/my_photos
+    Get Text  .item-count  ==  2 photos
+    Mirrored With Plus Button  .item-count  .photo-list
+
 Plus button on my photos is in line with latest and opens the add page
     Add Photo
     Go To  ${HOME_URL}/my_photos

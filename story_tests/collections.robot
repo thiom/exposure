@@ -23,6 +23,21 @@ Create Collection
     Get Url  matches  ${HOME_URL}/collection/\\d+$
 
 *** Test Cases ***
+Collection count on my collections is mirrored with the plus button
+    Create Collection
+    Create Collection  Day walks
+    Go To  ${HOME_URL}/my_collections
+    Get Text  .item-count  ==  2 collections
+    Mirrored With Plus Button  .item-count  .collection-list
+
+Plus button on my collections is a sixth of the image height
+    Create Collection
+    Go To  ${HOME_URL}/my_collections
+    ${plus}=  Get BoundingBox  .add-new
+    ${image}=  Get BoundingBox  .collection-card img
+    Should Be True  abs(${plus}[height] - ${image}[height] / 6) < 2
+    Should Be True  abs(${plus}[y] - ${image}[y]) < 2
+
 Without collections the text is centered below the plus button
     Go To  ${HOME_URL}/my_collections
     ${latest}=  Get BoundingBox  .nav-left >> text=latest

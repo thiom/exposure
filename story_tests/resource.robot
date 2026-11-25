@@ -68,3 +68,16 @@ Add Photo
     ${url}=  Get Url
     ${photo_id}=  Evaluate  $url.split("/")[-1]
     RETURN  ${photo_id}
+
+Mirrored With Plus Button
+    [Documentation]  The element is on the right edge of the page with its top
+    ...  in line with the plus button and as far from the edge as the plus
+    ...  button is from the left edge, and it does not overlap the list.
+    [Arguments]  ${element}  ${list}
+    ${plus}=  Get BoundingBox  .add-new
+    ${box}=  Get BoundingBox  ${element}
+    ${items}=  Get BoundingBox  ${list}
+    ${page_width}=  Get Property  .top-bar  clientWidth
+    Should Be True  abs(${box}[y] - ${plus}[y]) < 2
+    Should Be True  abs(${page_width} - ${box}[x] - ${box}[width] - ${plus}[x]) < 2
+    Should Be True  ${items}[x] + ${items}[width] < ${box}[x]

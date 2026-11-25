@@ -291,22 +291,31 @@ input[type="submit"].login-button,
 }
 
 /* my collections and my photos: the plus sign is at the left edge of the
-   page, in line with the "latest" link, and its height is a third of the
-   collection image height (images are 3:2, so 2/9 of the card width). The
+   page, in line with the "latest" link, and its height is a sixth of the
+   collection image height (images are 3:2, so 1/9 of the card width). The
    lists stay centered but are kept narrow enough to leave room for the plus
-   sign. My photos uses the same plus sign size as my collections. */
+   sign on the left and the photo or collection count on the right
+   (--count-space: the width of the longest count and a gap). My photos uses
+   the same plus sign size as my collections. */
 
 .my-collections,
 .my-photos {
   position: relative;
   container-type: inline-size;
+  --count-space: 8rem;
   --list-width: min(72rem - 2 * var(--edge),
-                    (50cqw - var(--edge) - 1.6667rem) * 18 / 11);
+                    (50cqw - var(--edge) - 1.6667rem) * 18 / 11,
+                    100cqw - 2 * (var(--edge) + var(--count-space)));
   --card-width: calc((var(--list-width) - 3rem) / 2);
 }
 
+.my-photos {
+  --count-space: 6.5rem;
+}
+
 .my-collections.single {
-  --list-width: min(34rem, (50cqw - var(--edge) - 2rem) * 18 / 13);
+  --list-width: min(34rem, (50cqw - var(--edge) - 2rem) * 18 / 13,
+                    100cqw - 2 * (var(--edge) + var(--count-space)));
   --card-width: var(--list-width);
 }
 
@@ -323,7 +332,8 @@ input[type="submit"].login-button,
 
 .my-photos .photo-list {
   width: min(60rem - 2 * var(--edge),
-             100cqw - 2 * (var(--edge) + var(--card-width) * 2 / 9 + 2rem));
+             100cqw - 2 * (var(--edge) + var(--card-width) / 9 + 2rem),
+             100cqw - 2 * (var(--edge) + var(--count-space)));
   max-width: none;
   padding-left: 0;
   padding-right: 0;
@@ -334,8 +344,19 @@ input[type="submit"].login-button,
   top: 3rem;
   left: var(--edge);
   display: block;
-  width: calc(var(--card-width) * 2 / 9);
+  width: calc(var(--card-width) / 9);
   aspect-ratio: 1;
+}
+
+/* the number of photos or collections, on the right edge of the page with
+   its top in line with the plus sign */
+.item-count {
+  position: absolute;
+  top: 3rem;
+  right: var(--edge);
+  margin: 0;
+  line-height: 1;
+  color: var(--muted);
 }
 
 /* without photos or collections, the plus sign takes its own space so that
@@ -733,7 +754,11 @@ input[type="submit"].tag-button.new {
     top: 0;
     left: 0;
     margin: 2rem var(--edge) 0 var(--edge);
-    width: calc((100cqw - 2 * var(--edge)) * 2 / 9);
+    width: calc((100cqw - 2 * var(--edge)) / 9);
+  }
+
+  .item-count {
+    top: 2rem;
   }
 
 }

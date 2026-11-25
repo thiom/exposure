@@ -234,6 +234,23 @@ class TestPhotoLists(BaseTestCase):
         self.assertIn(b"not added any photos", response.data)
         self.assertIn(b'class="my-photos no-items"', response.data)
 
+    def test_my_photos_shows_own_photo_count(self):
+        self.add_photo()
+        response = self.client.get("/my_photos")
+        self.assertIn(b'<p class="item-count">1 photo</p>', response.data)
+        self.add_photo()
+        self.logout()
+        self.register("uolevi")
+        self.add_photo()
+        self.logout()
+        self.login("maija")
+        response = self.client.get("/my_photos")
+        self.assertIn(b'<p class="item-count">2 photos</p>', response.data)
+
+    def test_my_photos_has_no_count_without_photos(self):
+        response = self.client.get("/my_photos")
+        self.assertNotIn(b"item-count", response.data)
+
     def test_my_photos_requires_login(self):
         self.logout()
         self.assertEqual(self.client.get("/my_photos").status_code, 403)

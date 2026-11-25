@@ -426,9 +426,14 @@ listauksesta. Ilman JavaScriptiä jokainen painallus on lomakkeen lähetys, jote
 * **Plus-painikkeet:** my photos- ja my collections -sivujen lisäyspainike sekä
   kokoelmalomakkeen kuvan lisäyspainike ovat CSS:llä piirrettyjä ohuita
   plus-merkkejä (`::before`/`::after`). Sivujen plus on yläpalkin `latest`-linkin
-  kohdalla ja ensimmäisen kuvan yläreunan tasalla. Sen koko on kolmasosa
+  kohdalla ja ensimmäisen kuvan yläreunan tasalla. Sen koko on kuudesosa
   kokoelmakuvan korkeudesta, ja se lasketaan container query -yksiköillä
   (`cqw`). Lista kapenee tarvittaessa, jottei plus osu kuvien päälle.
+* **Määrä:** my photos- ja my collections -sivuilla on oikeassa reunassa
+  omien kuvien tai kokoelmien määrä (`2 photos`, `1 collection`). Se on plussan
+  peilikuvana: yläreuna plussan tasalla ja yhtä kaukana oikeasta reunasta kuin
+  plus on vasemmasta. Lista kapenee tarvittaessa myös tekstin vuoksi
+  (`--count-space`). Tyhjällä sivulla määrää ei näytetä.
 * **Kokoelman sivu:** otsikko, kuvaus (enintään puoleen väliin kuvien
   leveydestä) ja omistajan `edit` ovat kuvien vasemman reunan tasalla, ja
   päiväys on viimeisen kuvan alla oikeassa reunassa.
@@ -454,7 +459,7 @@ Ilman skriptiä: `python3 -m unittest`.
 | Tiedosto | Kattaa |
 | --- | --- |
 | `test_users.py` | Rekisteröinti ja sen virheet, syötteiden säilyminen virhetilanteissa, kirjautuminen, uloskirjautuminen, yläpalkin linkit ja niiden järjestys |
-| `test_photos.py` | Kuvan lisäys (pääte, koko, JPEG-tunniste, kuvaus, 500 kuvan raja, oikea testikuva), kuvadatan palautus, näyttö, muokkaus, poisto, omistajuus, CSRF, latest-sivutus, my photos ja sen plus-painike, back-painike ja sen osoitteen rajaus |
+| `test_photos.py` | Kuvan lisäys (pääte, koko, JPEG-tunniste, kuvaus, 500 kuvan raja, oikea testikuva), kuvadatan palautus, näyttö, muokkaus, poisto, omistajuus, CSRF, latest-sivutus, my photos, sen plus-painike ja kuvien määrä, back-painike ja sen osoitteen rajaus |
 | `test_details.py` | Kameratietojen jäsennys ja rajat, virheilmoitukset, näyttömuotoilu (mm, f/, 1/x s), lisäys ja muokkaus, näkyvyys vain kuvan sivulla, kurssiohjeen testiarvot |
 | `test_tags.py` | Normalisointi, pilkkulista, sama nimi = sama tagi, sumea haku, lisäys ja poisto, 20 tagin raja, käyttämättömien tagien poisto, tagisivu |
 | `test_search.py` | Etusivun hakulomake, haku kuvauksesta ja tageista, usean tagin kautta osuva kuva näkyy kerran, haku ilman kirjautumista, tyhjä ja tulokseton haku, SQL-erikoismerkit hakusanassa |
@@ -485,7 +490,7 @@ painikkeita. Rakenne on sama kuin bibtexgen-projektissa.
 | --- | --- |
 | `resource.robot` | Yhteiset muuttujat ja avainsanat: selaimen avaus, tietokannan nollaus, rekisteröinti, kirjautuminen, kuvan lisäys |
 | `login.robot` | Rekisteröinti, varattu tunnus, eri salasanat, siirtyminen rekisteröintisivulta kirjautumissivulle, väärä salasana (syötteet säilyvät kentissä), kirjautuminen ja uloskirjautuminen |
-| `photos.robot` | Kuvan lisäys tietoineen ja tageineen, kuvauksen muokkaus, kuvan poisto, haku ja back-painike, my photos -sivun plus-painikkeen sijainti |
+| `photos.robot` | Kuvan lisäys tietoineen ja tageineen, kuvauksen muokkaus, kuvan poisto, haku ja back-painike, my photos -sivun plus-painikkeen ja kuvien määrän sijainti |
 | `comments.robot` | Toisen käyttäjän kuvan kommentointi, kirjautumattoman käyttäjän `log in to comment` |
 | `collections.robot` | Kokoelman luonti plus-painikkeilla, luonti ilman kuvia, järjestyksen ja otsikon muutos, näkyminen latest-sivulla ja haussa, kokoelman poisto |
 

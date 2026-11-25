@@ -443,6 +443,24 @@ class TestMyCollections(CollectionTestCase):
         self.assertNotIn(b'class="collection-list', response.data)
         self.assertNotIn(b"add new</a>", response.data)
 
+    def test_collection_count(self):
+        photo_id = self.add_photo()
+        self.create_collection([photo_id])
+        response = self.client.get("/my_collections")
+        self.assertIn(b'<p class="item-count">1 collection</p>', response.data)
+        self.create_collection([photo_id])
+        self.logout()
+        self.register("uolevi")
+        self.create_collection([self.add_photo()])
+        self.logout()
+        self.login("maija")
+        response = self.client.get("/my_collections")
+        self.assertIn(b'<p class="item-count">2 collections</p>', response.data)
+
+    def test_no_count_without_collections(self):
+        response = self.client.get("/my_collections")
+        self.assertNotIn(b"item-count", response.data)
+
     def test_single_collection_is_centered(self):
         photo_id = self.add_photo()
         self.create_collection([photo_id])
