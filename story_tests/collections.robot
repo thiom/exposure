@@ -23,6 +23,15 @@ Create Collection
     Get Url  matches  ${HOME_URL}/collection/\\d+$
 
 *** Test Cases ***
+Without collections the text is centered below the plus button
+    Go To  ${HOME_URL}/my_collections
+    ${latest}=  Get BoundingBox  .nav-left >> text=latest
+    ${plus}=  Get BoundingBox  .add-new
+    ${text}=  Get BoundingBox  .empty >> text=You have not created any collections yet.
+    Should Be True  abs(${plus}[x] - ${latest}[x]) < 2
+    Should Be True  ${plus}[y] + ${plus}[height] <= ${text}[y]
+    Get Style  .empty  text-align  ==  center
+
 User can create a collection
     Go To  ${HOME_URL}/my_collections
     Click  .add-new

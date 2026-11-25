@@ -3,9 +3,11 @@
 {% block title %}My collections{% endblock %}
 
 {% block content %}
-<div class="my-collections{% if collections | length == 1 %} single{% endif %}">
+<div class="my-collections{% if collections | length == 1 %} single{% endif %}{% if not collections %} no-items{% endif %}">
   <a href="/new_collection" class="add-new" title="add new collection"><span class="hidden-label">add new collection</span></a>
+  {% if collections %}
   {% include "collection_list.html" %}
+  {% endif %}
 </div>
 
 {% if not collections %}

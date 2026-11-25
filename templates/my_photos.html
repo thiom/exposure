@@ -3,7 +3,7 @@
 {% block title %}My photos{% endblock %}
 
 {% block content %}
-<div class="my-photos">
+<div class="my-photos{% if not photos %} no-items{% endif %}">
   <a href="/new_photo" class="add-new" title="add new photo"><span class="hidden-label">add new photo</span></a>
   {% if photos %}
   {% include "photo_list.html" %}

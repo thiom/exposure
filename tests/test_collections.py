@@ -439,6 +439,8 @@ class TestMyCollections(CollectionTestCase):
         response = self.client.get("/my_collections")
         self.assertIn(b"not created any collections", response.data)
         self.assertIn(b'href="/new_collection" class="add-new"', response.data)
+        self.assertIn(b'class="my-collections no-items"', response.data)
+        self.assertNotIn(b'class="collection-list', response.data)
         self.assertNotIn(b"add new</a>", response.data)
 
     def test_single_collection_is_centered(self):

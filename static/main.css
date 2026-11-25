@@ -152,6 +152,13 @@ form.inline {
   display: inline;
 }
 
+/* log in and register buttons on the login page have the same width */
+input[type="submit"].login-button,
+.button.login-button {
+  width: 6.5rem;
+  text-align: center;
+}
+
 .hidden-label {
   position: absolute;
   width: 1px;
@@ -325,6 +332,19 @@ form.inline {
   display: block;
   width: calc(var(--card-width) * 2 / 9);
   aspect-ratio: 1;
+}
+
+/* without photos or collections, the plus sign takes its own space so that
+   the "You have not..." text is shown below it */
+.no-items .add-new {
+  position: relative;
+  top: 0;
+  left: 0;
+  margin: 3rem var(--edge) 0 var(--edge);
+}
+
+.no-items + .empty {
+  text-align: center;
 }
 
 .add-new::before,

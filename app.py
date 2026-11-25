@@ -525,28 +525,29 @@ def remove_photo(photo_id):
 
 @app.route("/register")
 def register():
-    return render_template("register.html")
+    return render_template("register.html", filled={})
 
 @app.route("/create", methods=["POST"])
 def create():
     username = request.form["username"]
     password1 = request.form["password1"]
     password2 = request.form["password2"]
+    filled = {"username": username, "password1": password1, "password2": password2}
     if not username.strip() or len(username) > 30:
         flash("Username must be 1-30 characters long")
-        return redirect("/register")
+        return render_template("register.html", filled=filled)
     if len(password1) < 10 or len(password1) > 30:
         flash("Password must be 10-30 characters long")
-        return redirect("/register")
+        return render_template("register.html", filled=filled)
     if password1 != password2:
         flash("Passwords do not match")
-        return redirect("/register")
+        return render_template("register.html", filled=filled)
 
     try:
         user_id = users.create_user(username, password1)
     except sqlite3.IntegrityError:
         flash("Username already in use, pick another one")
-        return redirect("/register")
+        return render_template("register.html", filled=filled)
 
     start_session(user_id, username)
     return redirect("/")
@@ -554,7 +555,7 @@ def create():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        return render_template("login.html", filled={})
 
     if request.method == "POST":
         username = request.form["username"]
@@ -566,7 +567,8 @@ def login():
             return redirect("/")
         else:
             flash("Wrong username or password")
-            return redirect("/login")
+            filled = {"username": username, "password": password}
+            return render_template("login.html", filled=filled)
 
 @app.route("/logout")
 def logout():

@@ -232,6 +232,7 @@ class TestPhotoLists(BaseTestCase):
         response = self.client.get("/my_photos")
         self.assertIn(b'href="/new_photo" class="add-new"', response.data)
         self.assertIn(b"not added any photos", response.data)
+        self.assertIn(b'class="my-photos no-items"', response.data)
 
     def test_my_photos_requires_login(self):
         self.logout()

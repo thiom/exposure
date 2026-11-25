@@ -54,6 +54,15 @@ Search finds a photo and back returns to the results
     Click  .photo-info >> text=back
     Get Url  ==  ${HOME_URL}/search?query=sea
 
+Without photos the text is centered below the plus button
+    Go To  ${HOME_URL}/my_photos
+    ${latest}=  Get BoundingBox  .nav-left >> text=latest
+    ${plus}=  Get BoundingBox  .add-new
+    ${text}=  Get BoundingBox  .empty >> text=You have not added any photos yet.
+    Should Be True  abs(${plus}[x] - ${latest}[x]) < 2
+    Should Be True  ${plus}[y] + ${plus}[height] <= ${text}[y]
+    Get Style  .empty  text-align  ==  center
+
 Plus button on my photos is in line with latest and opens the add page
     Add Photo
     Go To  ${HOME_URL}/my_photos

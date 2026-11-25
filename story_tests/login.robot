@@ -15,12 +15,43 @@ Registering fails with a username that is in use
     Submit Registration  maija  ${PASSWORD}  ${PASSWORD}
     Get Text  .flash  *=  Username already in use, pick another one
     User Should Not Be Logged In
+    Get Property  id=username  value  ==  maija
+    Get Property  id=password1  value  ==  ${PASSWORD}
+    Get Property  id=password2  value  ==  ${PASSWORD}
+
+Registering fails when the passwords do not match and the inputs are kept
+    Submit Registration  maija  ${PASSWORD}  ${PASSWORD}x
+    Get Text  .flash  *=  Passwords do not match
+    User Should Not Be Logged In
+    Get Property  id=username  value  ==  maija
+    Get Property  id=password1  value  ==  ${PASSWORD}
+    Get Property  id=password2  value  ==  ${PASSWORD}x
 
 Login fails with a wrong password
     Create User  maija
     Submit Login  maija  wrong-password
     Get Text  .flash  *=  Wrong username or password
     User Should Not Be Logged In
+    Get Property  id=username  value  ==  maija
+    Get Property  id=password  value  ==  wrong-password
+
+Sign up link in the top bar opens the registration page
+    Go To  ${HOME_URL}/
+    ${sign_up}=  Get BoundingBox  .nav-right >> text=sign up
+    ${log_in}=  Get BoundingBox  .nav-right >> text=log in
+    Should Be True  ${sign_up}[x] + ${sign_up}[width] < ${log_in}[x]
+    Click  .nav-right >> text=sign up
+    Get Url  ==  ${REGISTER_URL}
+    Submit Registration  maija  ${PASSWORD}  ${PASSWORD}
+    User Should Be Logged In
+    Get Element Count  .nav-right >> text=sign up  ==  0
+
+Log in and register buttons are equally wide
+    Go To  ${LOGIN_URL}
+    ${log_in}=  Get BoundingBox  input[value="log in"]
+    ${register}=  Get BoundingBox  a >> text=register
+    Should Be True  abs(${log_in}[width] - ${register}[width]) < 1
+    Should Be True  abs(${log_in}[x] - ${register}[x]) < 1
 
 User can log in and log out
     Create User  maija

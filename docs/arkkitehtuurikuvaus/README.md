@@ -216,6 +216,10 @@ uudelleen.
 * **Salasana:** 10–30 merkkiä, ja se annetaan kahdesti. Tietokantaan
   tallennetaan vain hajautus (`generate_password_hash`).
 * Onnistunut rekisteröinti kirjaa käyttäjän suoraan sisään ja ohjaa etusivulle.
+* Virhetilanteessa (rekisteröinti tai kirjautuminen) lomake näytetään
+  uudelleen ilmoituksen kanssa, ja kenttiin jäävät käyttäjän syöttämät arvot
+  salasanat mukaan lukien. Arvot välitetään sivupohjalle parametrilla `filled`
+  kurssimateriaalin tapaan, ja Jinja escapeaa ne.
 * Kirjautumisvirheen ilmoitus (`Wrong username or password`) on sama väärälle
   tunnukselle ja väärälle salasanalle, joten tunnusten olemassaoloa ei voi
   päätellä.
@@ -403,7 +407,9 @@ listauksesta. Ilman JavaScriptiä jokainen painallus on lomakkeen lähetys, jote
 
 * **Yläpalkki** (`layout.html`, lohkot `nav_left` ja `nav_right`): vasemmalla
   `latest`, keskellä `exposure` (etusivulle) ja oikealla kirjautuneelle
-  `my photos`, `my collections` ja `log out`, kirjautumattomalle `log in`.
+  `my photos`, `my collections` ja `log out`, kirjautumattomalle `sign up`
+  (rekisteröitymissivulle) ja `log in`. Oikean reunan viimeinen linkki on
+  aina `log in` tai `log out`, joten se pysyy samassa kohdassa.
   Kirjautumis- ja rekisteröintisivuilla on vain `exposure`.
 * **Sivupohjat:** yhteiset osat ovat omia tiedostojaan, jotka liitetään
   `include`-lauseella: `photo_list.html` (kuvalista),
@@ -447,7 +453,7 @@ Ilman skriptiä: `python3 -m unittest`.
 
 | Tiedosto | Kattaa |
 | --- | --- |
-| `test_users.py` | Rekisteröinti ja sen virheet, kirjautuminen, uloskirjautuminen, yläpalkin linkit ja niiden järjestys |
+| `test_users.py` | Rekisteröinti ja sen virheet, syötteiden säilyminen virhetilanteissa, kirjautuminen, uloskirjautuminen, yläpalkin linkit ja niiden järjestys |
 | `test_photos.py` | Kuvan lisäys (pääte, koko, JPEG-tunniste, kuvaus, 500 kuvan raja, oikea testikuva), kuvadatan palautus, näyttö, muokkaus, poisto, omistajuus, CSRF, latest-sivutus, my photos ja sen plus-painike, back-painike ja sen osoitteen rajaus |
 | `test_details.py` | Kameratietojen jäsennys ja rajat, virheilmoitukset, näyttömuotoilu (mm, f/, 1/x s), lisäys ja muokkaus, näkyvyys vain kuvan sivulla, kurssiohjeen testiarvot |
 | `test_tags.py` | Normalisointi, pilkkulista, sama nimi = sama tagi, sumea haku, lisäys ja poisto, 20 tagin raja, käyttämättömien tagien poisto, tagisivu |
@@ -478,7 +484,7 @@ painikkeita. Rakenne on sama kuin bibtexgen-projektissa.
 | Tiedosto | Kattaa |
 | --- | --- |
 | `resource.robot` | Yhteiset muuttujat ja avainsanat: selaimen avaus, tietokannan nollaus, rekisteröinti, kirjautuminen, kuvan lisäys |
-| `login.robot` | Rekisteröinti, varattu tunnus, väärä salasana, kirjautuminen ja uloskirjautuminen |
+| `login.robot` | Rekisteröinti, varattu tunnus, eri salasanat, väärä salasana (syötteet säilyvät kentissä), kirjautuminen ja uloskirjautuminen |
 | `photos.robot` | Kuvan lisäys tietoineen ja tageineen, kuvauksen muokkaus, kuvan poisto, haku ja back-painike, my photos -sivun plus-painikkeen sijainti |
 | `comments.robot` | Toisen käyttäjän kuvan kommentointi, kirjautumattoman käyttäjän `log in to comment` |
 | `collections.robot` | Kokoelman luonti plus-painikkeilla, luonti ilman kuvia, järjestyksen ja otsikon muutos, näkyminen latest-sivulla ja haussa, kokoelman poisto |
